@@ -1,0 +1,278 @@
+@import "elements.less";  
+
+// ============= //
+// = CSS Reset = //
+// ============= //
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, tt, var, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video{
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  vertical-align: baseline;
+  background: transparent;
+  font-weight: inherit;
+  font-style: inherit;
+  font-size: 100%;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+// HTML5 display-role reset for older browsers
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section{
+  display: block;
+}
+
+img{border: 0;}
+ul{list-style-type: none;}
+
+.clearfix{
+  zoom: 1;
+  
+  &:after{
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+  }
+}
+
+h1, h2, h3, h4 {
+  .font-smooth;
+}
+
+// LESS Variables //
+
+@bodyfamily: "Open Sans";
+
+@darkbg: #2C3E50;
+@offwhite: #F2F1EF;
+@blue: #4B77BE;
+
+@maxwidth: 1200px;
+
+/* Breakpoints */
+@highdensity: ~"only screen and (-webkit-min-device-pixel-ratio: 1.5)",
+              ~"only screen and (min--moz-device-pixel-ratio: 1.5)",
+              ~"only screen and (-o-min-device-pixel-ratio: 3/2)",
+              ~"only screen and (min-device-pixel-ratio: 1.5)";
+@mobile:      ~"only screen and (max-width: 529px)";
+@tablet:      ~"only screen and (min-width: 530px) and (max-width: 949px)";
+@desktop:     ~"only screen and (min-width: 950px) and (max-width: 1128px)";
+@desktop-xl:  ~"only screen and (min-width: 1129px)";
+@tabletandsmaller:      ~"only screen and (max-width: 949px)";
+
+// General Styles //
+
+body {
+  margin: 0;
+  padding: 32px;
+  font-family: @bodyfamily, arial, verdana, sans-serif;
+  background: @darkbg; 
+  text-rendering: optimizeLegibility; // enable better kerning and ligatures for Webkit. FF has this enabled by default for fonts >= 20px. IE does not support this
+}
+
+
+.main-container {
+  max-width: @maxwidth;
+  margin: 0 auto;
+  background: @offwhite;
+  .drop-shadow;
+}
+
+.wrapper {
+  width: 100%;
+}
+
+.header { 
+  position: relative;
+  background: @blue;
+  padding: 24px 32px;
+  h1 {
+    font-weight:400;
+    font-size: 42px;
+    color: @offwhite;
+    text-shadow: 2px 2px 0 @blue; 
+    letter-spacing: -1px;
+    z-index: 2;
+    position: relative;
+
+  }
+  img {
+    position: absolute;
+    right: 15px;
+    bottom: 0;
+    max-width: 60%;
+  }
+}
+
+.footer {
+  padding: 24px 32px;
+}
+
+
+@media @tabletandsmaller {
+  body {
+    padding: 0;
+  }
+  .header, 
+  .footer {
+    padding: 12px;
+    h1 { 
+      font-size: 20px;
+      font-weight: 600; 
+    }
+  }
+}
+
+/* map responsive */
+
+.map {
+  .container { 
+    position: relative;
+    height: 0;
+    padding-bottom: 50%;
+    iframe {
+      position: absolute;
+      top: 0; 
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
+
+@media only screen and (max-width: 401px) {
+  .main-container {
+      position: absolute;
+      top: 0; 
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+  }
+  .map {
+    position: absolute;
+    height: 70%;
+    padding: 0;
+    .container {
+      position: absolute;
+      top: 0; 
+      left: 0;
+      width: 100%;
+      height: 100%;
+
+    }
+  }
+  .footer .container { 
+    position: absolute;
+    bottom: 35px;
+    width: 100%;
+    .transform(scale(0.75));
+    #radios {
+      margin: 0 auto; 
+    }
+   }
+}
+
+
+/* Slider */
+.radios-to-slider{
+  background-color:#e0e0e0;
+  display:block;
+  position:relative;
+  margin: 0 auto 38px auto;
+  -webkit-box-sizing:content-box;
+     -moz-box-sizing:content-box;
+       -o-box-sizing:content-box;
+          box-sizing:content-box;
+}
+
+
+.radios-to-slider.medium{
+  height:22px;
+  -webkit-border-radius:25px;
+  -moz-border-radius:25px;
+  -o-border-radius:25px;
+  border-radius:25px;
+  padding:5px;
+}
+
+/* Levels */
+.radios-to-slider .slider-level{
+  background-color:#fff;
+  cursor:pointer;
+  position:absolute;
+  display:block;
+}
+
+.radios-to-slider .slider-level.slider-lower-level{
+  opacity:0.2;
+}
+
+.radios-to-slider.medium .slider-level{
+  width:22px;
+  height:22px;
+  -webkit-border-radius:22px;
+  -moz-border-radius:22px;
+  -o-border-radius:22px;
+  border-radius:22px;
+  z-index:2;
+}
+
+/* Labels */
+.slider-label{
+  position:absolute;
+  display:block;
+  cursor:pointer;
+  color:#5e5e5e;
+  text-align:center;
+}
+
+.radios-to-slider.medium .slider-label{
+  top:50px;
+  width:44px;
+}
+
+/* Slider bar */
+.radios-to-slider .slider-bar{
+  background-color:#00b4f1;
+  float:left;
+  height:100%;
+  width:0;
+  pointer-events:none;
+  display:none;
+  position:absolute;
+  left:0;
+  top:0;
+}
+
+.slider-bar.transition-enabled{
+  -webkit-transition:.2s;
+  -moz-transition:.2s;
+  -o-transition:.2s;
+  transition:.2s;
+}
+
+.radios-to-slider.medium .slider-bar{
+  -webkit-border-radius:22px;
+  -moz-border-radius:22px;
+  -o-border-radius:22px;
+  border-radius:22px;
+}
+
+/* Slider Knob */
+.slider-knob{
+  float:right;
+  background-color:#0977B5;
+}
+
+.radios-to-slider.medium .slider-knob{
+  width:32px;
+  height:32px;
+  -webkit-border-radius:25px;
+  -moz-border-radius:25px;
+  -o-border-radius:25px;
+  border-radius:25px;
+}
