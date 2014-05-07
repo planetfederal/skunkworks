@@ -14,7 +14,8 @@ var app = (function() {
         source: new ol.source.TileWMS({
           url: '/geoserver/wms',
           params: {
-            LAYERS: 'opengeo:countries'
+            LAYERS: 'opengeo:countries',
+            TILED: true
           }
         })
       })
