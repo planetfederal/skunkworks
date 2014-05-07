@@ -46,7 +46,8 @@ See 'suite-sdk <command> --help' for more detail on a specific command.
 
 $
 ```
-Now change into a directory you use for your projects, and create a new application. Let's call it `app`:
+From the directory that contains this README, run the `suite-sdk` command to debug the application using our Suite's GeoServer as "local" GeoServer instance:
 ```sh
-$ suite-sdk create app
+$ suite-sdk debug -g http://localhost:8080/geoserver app
 ```
+Usually you would create a new application using the `suite-sdk create` command. In this case, we have already prepared the application, so you can go straight into debugging. The two interesting files are `index.html` and `app/app.js`. The former contains the markup of our application, the latter the JavaScript code.
