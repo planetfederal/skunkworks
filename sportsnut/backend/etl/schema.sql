@@ -1,4 +1,4 @@
-﻿
+DROP VIEW matchview;
 DROP TABLE IF EXISTS matches;
 DROP TABLE IF EXISTS stadiums;
 DROP TABLE IF EXISTS teams;

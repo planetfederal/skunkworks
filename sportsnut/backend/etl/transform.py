@@ -6,7 +6,7 @@ r = reader(open('stadiums.csv'))
 r.next()
 w.writerow(['stadium', 'lat', 'lon'])
 for i in r:
-    lat, lon = i[2].split(',')
+    lon, lat = i[2].split(',')
     w.writerow([i[0], lat, lon, None])
 
 w = writer(open('matches2.csv','w'))
