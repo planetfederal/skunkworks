@@ -32,3 +32,21 @@ CREATE TABLE matches (
   CONSTRAINT matches_stadium_fkey FOREIGN KEY (stadium)
       REFERENCES stadiums (stadium)
 );
+
+CREATE OR REPLACE VIEW matchview AS
+ SELECT m."time",
+    m.team1,
+    m.team2,
+    m.stadium,
+    m.timezone,
+    m.identifier,
+    ( SELECT teams.icon
+           FROM teams
+          WHERE teams.name = m.team1) AS icon1,
+    ( SELECT teams.icon
+           FROM teams
+          WHERE teams.name = m.team2) AS icon2,
+    ( SELECT stadiums.latlon
+           FROM stadiums
+          WHERE stadiums.stadium = m.stadium) AS latlon
+   FROM matches m;

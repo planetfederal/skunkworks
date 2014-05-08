@@ -1,4 +1,4 @@
-PGPASS=postgres psql -d sportsnut -U postgres -h localhost < ../backend/schema.sql
+PGPASS=postgres psql -d sportsnut -U postgres -h localhost < schema.sql
 PGPASS=postgres psql -d sportsnut -U postgres -h localhost -c 'COPY teams FROM STDIN WITH CSV HEADER' < teams.csv
 PGPASS=postgres psql -d sportsnut -U postgres -h localhost -c 'COPY stadiums FROM STDIN WITH CSV HEADER' < stadiums2.csv
 PGPASS=postgres psql -d sportsnut -U postgres -h localhost -c 'COPY matches FROM STDIN WITH CSV HEADER' < matches2.csv
