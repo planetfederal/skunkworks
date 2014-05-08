@@ -8,3 +8,6 @@ Using the following layers
 - NLFLOW, the connected flow lines
 - WATERBODY, the polygon waterbodies
 
+To run dev server:
+
+npm install && npm start
