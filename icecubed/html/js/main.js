@@ -44,21 +44,22 @@
   });
 
   var extentLayerNames = [
+    'extent_N_198008_polygon',
+    'extent_N_198308_polygon',
     'extent_N_198608_polygon',
     'extent_N_198908_polygon',
-    'extent_N_198308_polygon',
-    'extent_N_199808_polygon',
-    'extent_N_201008_polygon',
     'extent_N_199208_polygon',
-    'extent_N_201308_polygon',
-    'extent_N_198008_polygon',
+    'extent_N_199508_polygon',
+    'extent_N_199808_polygon',
     'extent_N_200108_polygon',
-    'extent_N_200708_polygon',
     'extent_N_200408_polygon',
-    'extent_N_199508_polygon'
+    'extent_N_200708_polygon',
+    'extent_N_201008_polygon',
+    'extent_N_201308_polygon'
   ];
 
-  function makeExtentLayer(layerName) {
+  function makeExtentLayer(layerName, isVisible) {
+    isVisible = !!isVisible;
     return new ol.layer.Tile({
       source: new ol.source.TileWMS({
         url: wmsUrl,
@@ -68,12 +69,19 @@
         },
         serverType: 'geoserver',
         projection: projection3413
-      })
+      }),
+      visible: isVisible
     });
   }
 
-  var iceLayers = extentLayerNames.map(makeExtentLayer);
-  var medianLayer = makeExtentLayer('median_N_08_1981_2010_polyline');
+  var iceLayers = [];
+  var layerLookup = {};
+  extentLayerNames.forEach(function(layerName) {
+    var layer = makeExtentLayer(layerName);
+    layerLookup[layerName] = layer;
+    iceLayers.push(layer);
+  });
+  var medianLayer = makeExtentLayer('median_N_08_1981_2010_polyline', true);
   var allLayers = [baseLayer].concat(iceLayers).concat(medianLayer);
 
   var map = new ol.Map({
@@ -85,6 +93,19 @@
       zoom: 2,
       projection: projection3408
     })
+  });
+
+  $('#radios').click(function(e) {
+    var target = e.target;
+    var layerName = target.getAttribute('data-radio');
+    var layer = layerLookup[layerName];
+    if (!layer) {
+      throw new Error('Could not find layer name: ' + layerName);
+    }
+    iceLayers.forEach(function(iceLayer) {
+      iceLayer.setVisible(false);
+    });
+    layer.setVisible(true);
   });
 
 }());
