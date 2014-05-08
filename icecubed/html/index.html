@@ -15,6 +15,10 @@
     <link rel="stylesheet" href="css/boilerplate.css">
 
     <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/proj4js/1.1.0/proj4js-compressed.js"></script>
+    <script src="http://spatialreference.org/ref/epsg/3408/proj4js/"></script>
+    <!-- script src="http://ol3js.org/en/master/build/ol.js" type="text/javascript"></script> -->
+    <script src="http://ol3js.org/en/master/build/ol-whitespace.js" type="text/javascript"></script>
 </head>
 
 <body>
@@ -31,8 +35,7 @@
     </div>
 
     <div class="map wrapper">
-        <div class="container">
-            <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d19191569.0961277!2d-33.063406468686075!3d72.9271485183121!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sus!4v1399484008493" width="600" height="450" frameborder="0" style="border:0"></iframe>
+        <div id="map" class="container">
         </div> <!-- #main -->
     </div> <!-- #main-container -->
 
