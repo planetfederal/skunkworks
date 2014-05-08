@@ -4,7 +4,7 @@ var proxy = require('http-proxy').createProxy();
 var connect = require('connect');
 
 var options = {
-  '/gs': 'http://ec2-54-221-78-168.compute-1.amazonaws.com:8080',
+  '/gs': 'http://ec2-75-101-218-208.compute-1.amazonaws.com:8080',
   '/': 'http://localhost:8081'
 };
 
