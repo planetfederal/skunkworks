@@ -4,46 +4,13 @@
 
 var app = (function() {
 
-  var featuresByFid = {};
-  var clearedCountries = [];
-  var flaggedCountries = [];
-
+  // Append '?states' or '?nybb' to the url to play with US states or New York
   var table = window.location.search ?
       window.location.search.substr(1) : 'countries';
 
-  var minefield = new ol.source.GeoJSON({
-    url: '/geoserver/wfs?SERVICE=WFS&VERSION=1.1.0&REQUEST=GetFeature&SRSNAME=EPSG:4326&TYPENAME=geomines:setup&outputformat=application/json&VIEWPARAMS=table:' + table
-  });
-  minefield.once('change', function() {
-    $('#map').css('background-image', 'none');
-    map.getView().fitExtent(minefield.getExtent(), map.getSize());
-    map.getLayers().forEach(function(l) { l.setVisible(true); });
-    minefield.forEachFeature(function(feature) {
-      featuresByFid[feature.get('fid')] = feature;
-    });
-  });
-
-  var cleared = new ol.source.ImageWMS({
-    url: '/geoserver/wms',
-    params: {
-      LAYERS: 'geomines:sweep',
-      FORMAT: 'image/png8',
-      STYLES: 'clear_countries',
-      VIEWPARAMS: 'table:' + table,
-      FEATUREID: ','
-    }
-  });
-
-  var flagged = new ol.source.ImageWMS({
-    url: '/geoserver/wms',
-    params: {
-      LAYERS: 'geomines:sweep',
-      FORMAT: 'image/png8',
-      STYLES: 'flagged_countries',
-      VIEWPARAMS: 'table:' + table,
-      FEATUREID: ','
-    }
-  });
+  var featuresByFid = {};
+  var clearedCountries = [];
+  var flaggedCountries = [];
 
   function getMinedNeighbours(feature) {
     var neighbours = feature.get('neighbours').split(',');
@@ -92,6 +59,40 @@ var app = (function() {
       })
     }));
   }
+
+  var minefield = new ol.source.GeoJSON({
+    url: '/geoserver/wfs?SERVICE=WFS&VERSION=1.1.0&REQUEST=GetFeature&SRSNAME=EPSG:4326&TYPENAME=geomines:setup&outputformat=application/json&VIEWPARAMS=table:' + table
+  });
+  minefield.once('change', function() {
+    $('#map').css('background-image', 'none');
+    map.getView().fitExtent(minefield.getExtent(), map.getSize());
+    map.getLayers().forEach(function(l) { l.setVisible(true); });
+    minefield.forEachFeature(function(feature) {
+      featuresByFid[feature.get('fid')] = feature;
+    });
+  });
+
+  var cleared = new ol.source.ImageWMS({
+    url: '/geoserver/wms',
+    params: {
+      LAYERS: 'geomines:sweep',
+      FORMAT: 'image/png8',
+      STYLES: 'clear_countries',
+      VIEWPARAMS: 'table:' + table,
+      FEATUREID: ','
+    }
+  });
+
+  var flagged = new ol.source.ImageWMS({
+    url: '/geoserver/wms',
+    params: {
+      LAYERS: 'geomines:sweep',
+      FORMAT: 'image/png8',
+      STYLES: 'flagged_countries',
+      VIEWPARAMS: 'table:' + table,
+      FEATUREID: ','
+    }
+  });
 
   var map = new ol.Map({
     view: new ol.View2D({
