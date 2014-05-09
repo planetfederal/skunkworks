@@ -1,22 +1,9 @@
 # Minesweeper goes Geo
 
-## 1. Data download and preparation
+This game app was developed by [@sbalasub](http://github.com/sbalasub), [@jmarin](http://github.com/jmarin), [@dwins](http://github.com/dwins), [@bosth](http://github.com/bosth) and [@ahocevar](http://github.com/ahocevar) during the Boundles Spring Kickoff in May 2014 in New Orleans.
 
 
-- First download countries shapefile from http://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-countries/
-
-- Create new Postgis database called geomines, this can be most easily be accomplished by using PgAdmin:
-
-<insert image here>
-
-Using PgAdmin or pgsql make sure you enable the Postgis extension: ```create extension postgis```;
-
-- Create new Postgis datastore called geomines with the default datastore
-
-<insert image here>
-
-
-## 2. Load data into PostGIS
+## 1. Load data into PostGIS
 
 - GeoMines requires a polygon or multipolygon data set to be loaded into a PostGIS database named ``geomines``:
 
@@ -35,7 +22,7 @@ psql -c "CREATE EXTENSION postgis;" geomines
 
     ``ALTER TABLE countries RENAME COLUMN the_geom TO geom;``
 
-## 3. GeoServer services creation
+## 2. GeoServer services creation
 
 - Create a ``geomines`` workspace. 
 
@@ -63,7 +50,15 @@ GROUP BY a.fid
 
    There are two parameters in the view: ``table``, which allows us to use any table in the database for our game map; and ``field`` which is a number between 0 and 1 which indicates what percentage of features will btable``, which allows us to use any table in the database for our game map; and ``field`` which is a number between 0 and 1 which indicates what percentage of features will be mined. By default, we configured ``table`` to default to ``countries`` and ``field`` to ``0.2``.
 
-## 4. Client app configuration and building
+- Publish a new layer named ``sweep``. It will be the following SQL view:
+
+```
+select fid, geom from %table%
+```
+
+  Again the ``table`` parameter will be used and will default to ``countries``.
+
+## 3. Client app configuration and building
 
 We will be using the OpenGeo Suite Webapp SDK to build the client app. Follow the [instructions](http://localhost:8080/opengeo-docs/installation/index.html#installation) for your platform to install the SDK. You will find the relevant information under the "New installation" section. The component you need, depending on your platform, is the "Webapp SDK" or the "OpenGeo CLI Tools". To make the `suite-sdk` command available, be sure to add the tools directory to your system's path as described in the instructions. Also make sure your system meets the [prerequisites](http://localhost:8080/opengeo-docs/webapps/webappsdk.html#webapps-sdk).
 

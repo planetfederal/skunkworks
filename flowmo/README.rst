@@ -83,15 +83,22 @@ GeoServer Layers
 - Add a layer named ``wsa_rivers`` referencing the wsa_rivers table
 - Use the ``wsa_layers.sld`` to style the layer
 - Add a layer named ``wsa_downstream`` and make it a SQL view layer
+
   - Use the wsa_downstream CTE SQL to fill in the layer definition
   - Use the ``wsa_downstream.sld`` to style the layer
+  
 - Add a layer named ``wsa_downstream_vector`` and make it a SQL view layer
+
   - Use the wsa_downstream_vector CTE SQL to fill in the layer definition
   - Use the ``wsa_downstream.sld`` to style the layer
+  
 - Add a layer named ``wsa_affected`` and make it a SQL view layer
+
   - Use the wsa_affected CTE SQL to fill in the layer definition
   - Use the ``wsa_affected.sld`` to style the layer
+  
 - Add a layer named ``wsa_affected_vector`` and make it a SQL view layer
+
   - Use the wsa_affected_vector CTE SQL to fill in the layer definition
   - Use the ``wsa_affected.sld`` to style the layer
 
@@ -104,6 +111,7 @@ wsa_downstream
 
 ::
 
+  # default value gid = 885367
    WITH RECURSIVE downstream(gidlist, gid, geom, trmmdwtrsh) AS (
      SELECT ARRAY[gid] as gidlist, gid, geom, trmmdwtrsh FROM wsa_rivers WHERE gid = %gid%
    UNION ALL
@@ -121,6 +129,7 @@ wsa_affected
 
 ::
 
+  # default value gid = 885367, radius = 500
   WITH RECURSIVE downstream(gidlist, gid, geom, trmmdwtrsh) AS (
     SELECT ARRAY[gid] as gidlist, gid, geom, trmmdwtrsh FROM wsa_rivers WHERE gid = %gid%
   UNION ALL
@@ -140,8 +149,9 @@ wsa_downstream_vector
 
 ::
 
+  # default value gid = 885367
   WITH RECURSIVE downstream(gidlist, gid, geom, trmmdwtrsh) AS (
-    SELECT ARRAY[gid] as gidlist, gid, geom, trmmdwtrsh FROM wsa_rivers WHERE gid = 885367
+    SELECT ARRAY[gid] as gidlist, gid, geom, trmmdwtrsh FROM wsa_rivers WHERE gid = %gid%
   UNION ALL
     SELECT array_append(d.gidlist, r.gid) AS gidlist, r.gid, r.geom, r.trmmdwtrsh
     FROM downstream d, wsa_rivers r
@@ -157,11 +167,14 @@ wsa_affacted_vector
 
 ::
 
+  # default value {"type":"LineString","coordinates":[[-13754654.8188296,6216692.99816636],[-13754801.9782898,6216654.00547668]]}
   SELECT ogc_fid, wkb_geometry, licence_no, purpose, strm_name, licensee, ddrssln1, ddrssln2
   FROM wls_pdl_sp_point 
-  WHERE ST_DWithin(wkb_geometry, 
-    ST_SetSRID(ST_GeomFromGeoJSON('{"type":"LineString","coordinates":[[1180037.25,407540.750000003],[1179940.625,407511.718999996]]}'),3005), 500)
-  AND lic_status = 'CURRENT';
+  WHERE ST_DWithin(wkb_geometry, ST_Transform(ST_SetSRID(ST_GeomFromGeoJSON('%json%'),3857),3005), 500)
+  AND lic_status = 'CURRENT'
+
+
+
 
 
 Interface
