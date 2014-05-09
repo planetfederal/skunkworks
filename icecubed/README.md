@@ -60,8 +60,9 @@ Test the unique functions of the OpenGeo Suite that differentiates it from other
   * Reprojections in QGIS.  
   * Upload into PostGIS.  
   * Visualization in QGIS.
-* The Suite QGIS plugin allows the end user/analyst to access/modify/visualize changes without having to go through a CLI or GeoServer interface.
+* The Suite QGIS plugin allows the end user/analyst to access/modify/visualize changes without having to go through a CLI or GeoServer interface. Great potential to "grow the pie" of potential users by allowing analysts to publish maps directly.
 * Data Management (discovering, downloading, processing, uploading the data) consumes the majority of time required to produce a map application.
+* GeoWebCache workflow in the GeoServer UI is unclear. Process / workflow for creating gridset, accessing layer, applying gridset, determining cache extents could be simplified. 
 
 # Artifacts:
 Most of the data and styles are checked directly into the repo. The base map is natural earth reprojected to 3408, and can be found at:
