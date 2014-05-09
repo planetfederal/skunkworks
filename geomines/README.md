@@ -63,6 +63,14 @@ GROUP BY a.fid
 
    There are two parameters in the view: ``table``, which allows us to use any table in the database for our game map; and ``field`` which is a number between 0 and 1 which indicates what percentage of features will btable``, which allows us to use any table in the database for our game map; and ``field`` which is a number between 0 and 1 which indicates what percentage of features will be mined. By default, we configured ``table`` to default to ``countries`` and ``field`` to ``0.2``.
 
+- Publish a new layer named ``sweep``. It will be the following SQL view:
+
+```
+select fid, geom from %table%
+```
+
+  Again the ``table`` parameter will be used and will default to ``countries``.
+
 ## 4. Client app configuration and building
 
 We will be using the OpenGeo Suite Webapp SDK to build the client app. Follow the [instructions](http://localhost:8080/opengeo-docs/installation/index.html#installation) for your platform to install the SDK. You will find the relevant information under the "New installation" section. The component you need, depending on your platform, is the "Webapp SDK" or the "OpenGeo CLI Tools". To make the `suite-sdk` command available, be sure to add the tools directory to your system's path as described in the instructions. Also make sure your system meets the [prerequisites](http://localhost:8080/opengeo-docs/webapps/webappsdk.html#webapps-sdk).
