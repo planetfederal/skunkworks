@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <link rel="stylesheet" href="resources/ol3//ol.css" type="text/css">
+    <link rel="stylesheet" href="http://getbootstrap.com/dist/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="resources/bootstrap/css/bootstrap-responsive.min.css" type="text/css">
+    <link rel="stylesheet" href="resources/slider/css/bootstrap-slider.min.css" type="text/css">
+    <title>Sports Nut - World Cup edition</title>
+    <style>
+      #wmsTimeSlider .slider-selection {
+	background: #BABABA;
+      }
+      #wmsTimeSlider {
+        margin-top: 20px;
+        margin-left: 20px;
+        margin-bottom: 20px;
+      }
+      #playbackToolbar {
+        margin-bottom: 20px;
+      }
+      #map {
+        width: 400px;
+        top: 5px;
+        left: 500px;
+        position: absolute;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="container-fluid">
+
+      <div class="row-fluid">
+        <div class="span12">
+          <input id="wmstime" data-slider-id='wmsTimeSlider' type="text" data-slider-value="0"/>
+<div id="playbackToolbar" class="btn-toolbar" role="toolbar">
+<button id="play" type="button" class="btn btn-default">
+  <span class="glyphicon glyphicon-play"></span> Play
+</button>
+<button id="pause" type="button" class="btn btn-default">
+  <span class="glyphicon glyphicon-pause"></span> Pause
+</button>
+<button id="stop" type="button" class="btn btn-default">
+  <span class="glyphicon glyphicon-stop"></span> Stop
+</button>
+<button id="backward" type="button" class="btn btn-default">
+  <span class="glyphicon glyphicon-backward"></span> Backward
+</button>
+<button id="forward" type="button" class="btn btn-default">
+  <span class="glyphicon glyphicon-forward"></span> Forward
+</button>
+</div>
+          <div id="map" class="map"></div>
+        </div>
+      </div>
+
+      </div>
+
+    </div>
+
+    <script src="resources/jquery.min.js" type="text/javascript"></script>
+    <script src="resources/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="resources/slider/js/bootstrap-slider.min.js" type="text/javascript"></script>
+    <script src="resources/ol3/ol-whitespace.js" type="text/javascript"></script>
+    <script src="app.js" type="text/javascript"></script>
+
+  </body>
+</html>

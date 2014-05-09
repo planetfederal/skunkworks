@@ -8,10 +8,16 @@ var app = (function() {
   var clearedCountries = [];
   var flaggedCountries = [];
 
+  var table = window.location.search ?
+      window.location.search.substr(1) : 'countries';
+
   var minefield = new ol.source.GeoJSON({
-    url: '/geoserver/wfs?SERVICE=WFS&VERSION=1.1.0&REQUEST=GetFeature&SRSNAME=EPSG:4326&TYPENAME=geomines:setup&outputformat=application/json'
+    url: '/geoserver/wfs?SERVICE=WFS&VERSION=1.1.0&REQUEST=GetFeature&SRSNAME=EPSG:4326&TYPENAME=geomines:setup&outputformat=application/json&VIEWPARAMS=table:' + table
   });
   minefield.once('change', function() {
+    $('#map').css('background-image', 'none');
+    map.getView().fitExtent(minefield.getExtent(), map.getSize());
+    map.getLayers().forEach(function(l) { l.setVisible(true); });
     minefield.forEachFeature(function(feature) {
       featuresByFid[feature.get('fid')] = feature;
     });
@@ -23,6 +29,7 @@ var app = (function() {
       LAYERS: 'geomines:sweep',
       FORMAT: 'image/png8',
       STYLES: 'clear_countries',
+      VIEWPARAMS: 'table:' + table,
       FEATUREID: ','
     }
   });
@@ -33,6 +40,7 @@ var app = (function() {
       LAYERS: 'geomines:sweep',
       FORMAT: 'image/png8',
       STYLES: 'flagged_countries',
+      VIEWPARAMS: 'table:' + table,
       FEATUREID: ','
     }
   });
@@ -71,13 +79,14 @@ var app = (function() {
   }
 
   function blowUp() {
-    map.removeLayer(map.getLayers().pop());
+    map.getLayers().forEach(function(l) { l.setVisible(false); });
     map.addLayer(new ol.layer.Tile({
       source: new ol.source.TileWMS({
         url: '/geoserver/wms',
         params: {
           LAYERS: 'geomines:sweep',
           FORMAT: 'image/png8',
+          VIEWPARAMS: 'table:' + table,
           TILED: true
         }
       })
@@ -92,23 +101,28 @@ var app = (function() {
     }),
     layers: [
       new ol.layer.Tile({
+        visible: false,
         source: new ol.source.TileWMS({
           url: '/geoserver/wms',
           params: {
             LAYERS: 'geomines:sweep',
             STYLES: 'hidden_countries',
             FORMAT: 'image/png8',
+            VIEWPARAMS: 'table:' + table,
             TILED: true
           }
         })
       }),
       new ol.layer.Image({
+        visible: false,
         source: cleared
       }),
       new ol.layer.Image({
+        visible: false,
         source: flagged
       }),
       new ol.layer.Vector({
+        visible: false,
         source: minefield,
         style: (function() {
           var styleCache = {};
@@ -140,7 +154,7 @@ var app = (function() {
   });
 
   var popup = new ol.Overlay({
-    element: document.getElementById('popup')
+    element: $('#popup')
   });
   map.addOverlay(popup);
 
