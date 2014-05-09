@@ -1,17 +1,16 @@
-DATA
+TEAM
 ====
 
+Michael W.
+Kevin S.
+Paul R.
+Victor M.
+Gabriel R.
 
-NHN Hydrography data from 
 
-Home: http://www.geobase.ca/geobase/en/data/nhn/index.htm
-Data Dictionary: http://www.geobase.ca/doc/catalogue/GeoBase_NHN_Catalogue_1.0.1_EN.html
 
-Using the following layers
-
-- NLFLOW, the connected flow lines
-- WATERBODY, the polygon waterbodies
-
+DATA
+====
 
 BC WSA data from
 http://data.gov.bc.ca
@@ -23,6 +22,44 @@ http://www.data.gov.bc.ca/dbc/catalogue/detail.page?config=dbc&P110=recorduid:17
   ALTER TABLE wsa_rivers ALTER COLUMN geom TYPE Geometry(Linestring, 3005) USING ST_Force2D(geom);
   CLUSTER wsa_rivers USING wsa_rivers_geom_gist;
 
+
+
+CTE SQL Queries
+===============
+
+WSA_DOWNSTREAM
+--------------
+
+.. code-block:: sql
+   WITH RECURSIVE downstream(gidlist, gid, geom, trmmdwtrsh) AS (
+     SELECT ARRAY[gid] as gidlist, gid, geom, trmmdwtrsh FROM wsa_rivers WHERE gid = %gid%
+   UNION ALL
+     SELECT array_append(d.gidlist, r.gid) AS gidlist, r.gid, r.geom, r.trmmdwtrsh
+     FROM downstream d, wsa_rivers r
+     WHERE d.geom && r.geom
+     AND ST_Equals(ST_StartPoint(ST_GeometryN(d.geom,1)),ST_EndPoint(ST_GeometryN(r.geom,1)))
+     AND NOT d.gidlist @> ARRAY[r.gid]
+   )
+   SELECT gid, geom FROM downstream
+
+
+WSA_AFFECTED
+------------
+
+.. code-blocks:: sql
+
+  WITH RECURSIVE downstream(gidlist, gid, geom, trmmdwtrsh) AS (
+    SELECT ARRAY[gid] as gidlist, gid, geom, trmmdwtrsh FROM wsa_rivers WHERE gid = %gid%
+  UNION ALL
+    SELECT array_append(d.gidlist, r.gid) AS gidlist, r.gid, r.geom, r.trmmdwtrsh
+    FROM downstream d, wsa_rivers r
+    WHERE d.geom && r.geom
+    AND ST_Equals(ST_StartPoint(ST_GeometryN(d.geom,1)),ST_EndPoint(ST_GeometryN(r.geom,1)))
+    AND NOT d.gidlist @> ARRAY[r.gid]
+  )
+  SELECT ogc_fid, wkb_geometry, licence_no, purpose, strm_name, licensee, ddrssln1, ddrssln2
+  FROM wls_pdl_sp_point JOIN downstream ON ST_DWithin(downstream.geom, wls_pdl_sp_point.wkb_geometry, %radius%)
+  WHERE lic_status = 'CURRENT'
 
 
 
