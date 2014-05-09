@@ -1,31 +1,62 @@
 # Minesweeper goes Geo
 
-## 1. Data download and preparation
+This game app was developed by [@sbalasub](http://github.com/sbalasub), [@jmarin](http://github.com/jmarin), [@dwins](http://github.com/dwins), [@bosth](http://github.com/bosth) and [@ahocevar](http://github.com/ahocevar) during the Boundles Spring Kickoff in May 2014 in New Orleans.
 
 
-- First download countries shapefile from http://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-countries/
+## 1. Load data into PostGIS
 
-- Create new Postgis database called geomines, this can be most easily be accomplished by using PgAdmin:
+- GeoMines requires a polygon or multipolygon data set to be loaded into a PostGIS database named ``geomines``:
 
-<insert image here>
+```
+createdb geomines
+psql -c "CREATE EXTENSION postgis;" geomines
+```
 
-Using PgAdmin or pgsql make sure you enable the Postgis extension: ```create extension postgis```;
+- The only requirement is that there is a Geometry column named ``geom`` and a primary key named ``fid``.
 
-- Create new Postgis datastore called geomines with the default datastore
+- We have loaded three game maps into our database for the demo: ``states``, ``contries`` and ``nybb``:
 
-<insert image here>
+    ``shp2pgsql countries.shp | psql -U postgres geomines``
 
+- To rename a column to meet the requirements:
 
-
+    ``ALTER TABLE countries RENAME COLUMN the_geom TO geom;``
 
 ## 2. GeoServer services creation
 
-- Log in to GeoServer and use the importer to import the countries shapefile into Postgis (use default workspace)
+- Create a ``geomines`` workspace. 
 
-- Publish layer
+- Create a PostGIS store that connects to the ``geomines`` database. Ensure that "Expose Primary Keys" is checked.
 
+- Publish layer named ``setup``. It will be the following SQL view:
 
+```
+SELECT 
+  a.fid, 
+  count(a.fid), 
+  a.geom,
+  array_to_string(array_agg(b.fid), ',') AS neighbours,
+  CASE WHEN random() < %field% THEN true ELSE false END AS mined
+ FROM 
+  %table% AS a, 
+  %table% AS b 
+WHERE 
+  a <> b AND 
+  ST_Intersects(a.geom, b.geom) 
+GROUP BY a.fid
+```
 
+   The view will return the ``fid`` and geometry of each feature that has a land border with another feature (``ST_Intersects``). Additionally, we will receive the count of countries that are bordered and a comma-separated list of ``fid``s of the bordering features. Finally, the ``mined`` attribute will contain a boolean indicating whether there is a mine or not.
+
+   There are two parameters in the view: ``table``, which allows us to use any table in the database for our game map; and ``field`` which is a number between 0 and 1 which indicates what percentage of features will btable``, which allows us to use any table in the database for our game map; and ``field`` which is a number between 0 and 1 which indicates what percentage of features will be mined. By default, we configured ``table`` to default to ``countries`` and ``field`` to ``0.2``.
+
+- Publish a new layer named ``sweep``. It will be the following SQL view:
+
+```
+select fid, geom from %table%
+```
+
+  Again the ``table`` parameter will be used and will default to ``countries``.
 
 ## 3. Client app configuration and building
 
@@ -43,11 +74,30 @@ List of commands:
     deploy      Deploy an application to a remote OpenGeo Suite instance.
     
 See 'suite-sdk <command> --help' for more detail on a specific command.
-
-$
 ```
 From the directory that contains this README, run the `suite-sdk` command to debug the application using our Suite's GeoServer as "local" GeoServer instance:
 ```sh
 $ suite-sdk debug -g http://localhost:8080/geoserver app
 ```
 Usually you would create a new application using the `suite-sdk create` command. In this case, we have already prepared the application, so you can go straight into debugging. The two interesting files are `index.html` and `app/app.js`. The former contains the markup of our application, the latter the JavaScript code.
+
+To deploy the application, the `suite-sdk deploy` command is used:
+```sh
+$ suite-sdk deploy app
+
+Deploying application (this may take a few moments) ...
+Buildfile: /usr/local/opengeo/sdk/build.xml
+
+checkpath:
+
+build:
+
+package:
+Building war: /var/folders/d4/b721gqhj1wd6ck4zrbth7_2w0000gn/T/suite-sdk/build/app.war
+
+deploy:
+Deploying application (disregard message about undeployment failure if this is the first deployment)
+
+The 'suite-sdk deploy' command failed.
+```
+The command failed because we did not provide any credentials or target for a remote server. But we did get the generated `/var/folders/d4/b721gqhj1wd6ck4zrbth7_2w0000gn/T/suite-sdk/build/app.war` file, which we copied straight to our server's webapps directory using `scp`.

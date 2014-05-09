@@ -1,9 +1,21 @@
 var currentDate;
 var matchDates = [];
+var cities = {};
 var rewriteIcon = function(icon) {
   icon = icon.substring(icon.lastIndexOf('/')+1).replace('.svg', '.png');
-  return 'http://ec2-54-81-74-227.compute-1.amazonaws.com:8080/geoserver/styles/sportsnut/' + icon;
+  // preload
+  var img = new Image();
+  var rewrite = 'http://ec2-54-81-74-227.compute-1.amazonaws.com:8080/geoserver/styles/sportsnut/' + icon;
+  img.src = rewrite;
+  return rewrite;
 }
+      var popup = new Boundless.Popup({
+        element: document.getElementById('popup'),
+        closeBox: true,
+        offsetY: -125,
+        autoPan: true
+      });
+
 var loadFeatures = function(response) {
   // TODO this does not work with ol.js
   var features = vector.getSource().readFeatures(response);
@@ -14,6 +26,9 @@ var loadFeatures = function(response) {
     var time = Date.parse(feature.get('time'));
     if (matchDates.indexOf(time) == -1) {
       matchDates.push(time);
+    }
+    if (!(feature.get('stadium') in cities)) {
+      cities[feature.get('stadium')] = feature.getGeometry();
     }
   }
   matchDates.sort();
@@ -30,8 +45,34 @@ var loadFeatures = function(response) {
     vector.getSource().dispatchChangeEvent();
   });
   vector.getSource().addFeatures(features);
+  $("#hotels").typeahead({
+    source: goog.object.getKeys(cities),
+    updater: function(item) {
+        queryCity(item);
+        return item;
+    }
+  });
 };
 
+function queryCity(name) {
+    var coord = cities[name].getFirstCoordinate();
+    $.ajax({
+       url: hotelQuery + "lat:" + coord[1] + ";" + "lon:"+ coord[0],
+       dataType: 'jsonp'
+    });
+}
+
+function loadHotels(data) {
+    $("#hotel-results").html('');
+    data.features.forEach(function(n){
+        var name = n.properties.name;
+        if (name) {
+            $("#hotel-results").append('<div>'+name+'</div>');
+        }
+    });
+}
+
+var hotelQuery = 'http://ec2-54-81-74-227.compute-1.amazonaws.com:8080/geoserver/wfs?request=getfeature&&outputformat=text/javascript&format_options=callback:loadHotels&typeName=knn_lodging&viewparams=';
 var url = 'http://ec2-54-81-74-227.compute-1.amazonaws.com:8080/geoserver/wfs?service=WFS&request=GetFeature&typename=opengeo:matchview&srsname=EPSG:3857&version=1.0.0&outputformat=text/javascript&format_options=callback:loadFeatures';
 
 $.ajax({
@@ -93,7 +134,8 @@ var layers = [
 ];
 var map = new ol.Map({
   layers: layers,
-  target: 'map',
+  overlays: [popup],
+  target: document.getElementById('map'),
   view: new ol.View2D({
     center: [-7067287.25262743, -2705645.022595205],
     zoom: 3
@@ -104,7 +146,7 @@ vector.getSource().on('change', function(evt) {
   $('#wmstime').slider('setValue', newValue);
 });
 var timer;
-var frameRate = 2;
+var frameRate = 1;
 $('#play').on('click', function (e) {
   timer = window.setInterval(function() {
     var idx = matchDates.indexOf(currentDate);
@@ -143,3 +185,23 @@ $('#backward').on('click', function (e) {
     vector.getSource().dispatchChangeEvent();
   }
 });
+
+      $(map.getViewport()).on('mousemove', function(evt) {
+        var pixel = map.getEventPixel(evt.originalEvent);
+        var feature = map.forEachFeatureAtPixel(pixel, function(feature, layer) {
+          return feature;
+        });
+        if (feature) {
+          popup.setPosition(feature.getGeometry().getCoordinates());
+          var html = "<table class='table table-bordered'>";
+          html += '<tr><td>' + feature.get('team1') + ' vs ' + feature.get('team2') + '</td></tr>';
+          html += '<tr><td>' + feature.get('stadium') + '</td></tr>';
+          html += '<tr><td>' + feature.get('identifier') + '</td></tr>';
+          html += '</table>';
+          popup.setContent(html);
+          popup.show();
+        } else {
+          popup.hide();
+        }
+      });
+
