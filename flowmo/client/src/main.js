@@ -75,22 +75,10 @@ var riverSource = new ol.source.TileWMS({
   serverType: 'geoserver'
 });
 
-var downstreamSource = new ol.source.ImageWMS({
-  url: baseUrl + '/geoserver/wms',
-  params: {'LAYERS': 'boundless:wsa_downstream'},
-  serverType: 'geoserver'
-});
-
 var affectedSource = new ol.source.ImageWMS({
   url: baseUrl + '/geoserver/wms',
   params: {'LAYERS': 'boundless:wsa_affected'},
   serverType: 'geoserver'
-});
-
-
-var downstreamLayer = new ol.layer.Image({
-  source: downstreamSource,
-  visible: false
 });
 
 
@@ -104,7 +92,7 @@ var vectorLayer;
 function updateStream(gid) {
   if (gid) {
     gid = gid.split('.')[1];
-    downstreamSource.updateParams({'viewparams': 'gid:' + gid});
+    //downstreamSource.updateParams({'viewparams': 'gid:' + gid});
     affectedSource.updateParams({'viewparams': 'gid:' + gid});
 
     if (vectorLayer) {
@@ -112,7 +100,6 @@ function updateStream(gid) {
     }
     getDownstreamFeaturesLayer(gid);
 
-    //downstreamLayer.setVisible(true);
     affectedLayer.setVisible(true);
     getAffectedFeatures(gid);
   }
@@ -128,7 +115,6 @@ var map = new ol.Map({
     new ol.layer.Tile({
       source: riverSource
     }),
-    downstreamLayer,
     affectedLayer
   ],
   target: 'map',
