@@ -202,4 +202,5 @@ var app = (function() {
     }
   });
 
+  $("#modal").modal({ show : true });
 }());
