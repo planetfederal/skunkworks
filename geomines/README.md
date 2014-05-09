@@ -1,6 +1,6 @@
 # Minesweeper goes Geo
 
-This game app was developed by [@sbalasub](http://github.com/sbalasub), [@jmarin](http://github.com/jmarin), [@dwins](http://github.com/dwins), [@bosth](http://github.com/bosth) and [@ahocevar](http://github.com/ahocevar) during the Boundles Spring Kickoff in May 2014 in New Orleans.
+This game app was developed by [@sbalasub](http://github.com/sbalasub), [@jmarin](http://github.com/jmarin), [@dwins](http://github.com/dwins), [@bosth](http://github.com/bosth) and [@ahocevar](http://github.com/ahocevar) during the Boundless Kickoff in May 2014 in New Orleans.
 
 
 ## 1. Load data into PostGIS
@@ -46,17 +46,17 @@ WHERE
 GROUP BY a.fid
 ```
 
-   The view will return the ``fid`` and geometry of each feature that has a land border with another feature (``ST_Intersects``). Additionally, we will receive the count of countries that are bordered and a comma-separated list of ``fid``s of the bordering features. Finally, the ``mined`` attribute will contain a boolean indicating whether there is a mine or not.
+   The view will return the `fid` and geometry of each feature that has a land border with another feature (`ST_Intersects`). Additionally, we will receive the count of countries that are bordered and a comma-separated list of `fid`s of the bordering features. Finally, the `mined` attribute will contain a boolean indicating whether there is a mine or not.
 
-   There are two parameters in the view: ``table``, which allows us to use any table in the database for our game map; and ``field`` which is a number between 0 and 1 which indicates what percentage of features will btable``, which allows us to use any table in the database for our game map; and ``field`` which is a number between 0 and 1 which indicates what percentage of features will be mined. By default, we configured ``table`` to default to ``countries`` and ``field`` to ``0.2``.
+   There are two parameters in the view: `table`, which allows us to use any table in the database for our game map; and `field` which is a number between 0 and 1 which indicates what percentage of features that will be mined. By default, we configured `table` to default to `countries` and `field` to `0.2`.
 
-- Publish a new layer named ``sweep``. It will be the following SQL view:
+- Publish a new layer named `sweep`. It will be the following SQL view:
 
 ```
 select fid, geom from %table%
 ```
 
-  Again the ``table`` parameter will be used and will default to ``countries``.
+  Again the `table` parameter will be used and will default to `countries`.
 
 ## 3. Client app configuration and building
 
@@ -81,6 +81,8 @@ $ suite-sdk debug -g http://localhost:8080/geoserver app
 ```
 Usually you would create a new application using the `suite-sdk create` command. In this case, we have already prepared the application, so you can go straight into debugging. The two interesting files are `index.html` and `app/app.js`. The former contains the markup of our application, the latter the JavaScript code.
 
+To debug the application locally, we just browse to http://localhost:9080/.
+
 To deploy the application, the `suite-sdk deploy` command is used:
 ```sh
 $ suite-sdk deploy app
@@ -100,4 +102,4 @@ Deploying application (disregard message about undeployment failure if this is t
 
 The 'suite-sdk deploy' command failed.
 ```
-The command failed because we did not provide any credentials or target for a remote server. But we did get the generated `/var/folders/d4/b721gqhj1wd6ck4zrbth7_2w0000gn/T/suite-sdk/build/app.war` file, which we copied straight to our server's webapps directory using `scp`.
+The command failed because we did not provide any credentials or target for a remote server. But we did get the generated `/var/folders/d4/b721gqhj1wd6ck4zrbth7_2w0000gn/T/suite-sdk/build/app.war` file, which we copied straight to our server's webapps directory using `scp`. On the remote server, the app is now available under the `/app/` endpoint.

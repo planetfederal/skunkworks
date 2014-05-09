@@ -138,7 +138,7 @@ var map = new ol.Map({
   target: document.getElementById('map'),
   view: new ol.View2D({
     center: [-7067287.25262743, -2705645.022595205],
-    zoom: 3
+    zoom: 4
   })
 });
 vector.getSource().on('change', function(evt) {
@@ -205,3 +205,12 @@ $('#backward').on('click', function (e) {
         }
       });
 
+      map.on('singleclick', function(evt) {
+        var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+          return feature;
+        });
+        if (feature) {
+          $("#hotels").val(feature.get('stadium'));
+          queryCity(feature.get('stadium'));
+        }
+      });
