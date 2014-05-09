@@ -1,7 +1,7 @@
 
 
-//var baseUrl = 'http://ec2-75-101-218-208.compute-1.amazonaws.com:8080';
-var baseUrl = 'http://localhost:8000/gs'
+var baseUrl = 'http://flowmo.servebeer.com';
+//var baseUrl = 'http://localhost:8000/gs'
 
 var wfsUrl = baseUrl + '/geoserver/wfs';
 
