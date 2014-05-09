@@ -6,10 +6,10 @@
 Josh Campbell, Matt Richards, Rob Marianski, Akiyo Dunetz
 
 # Application
-Ice3 is a mapping application that visualizes changes in Arctic sea ice over a 33 year period (1980-2013). The maximum August sea ice extent is shown in the timeline slider beneath the map. Additionally, an outline of the 30-year (1981-2010) median August sea ice extent is included for comparison. All data is from the National Snow and Ice Data Center (http://nsidc.org/data/seaice_index/), a source for consistently processed ice extent and concentration images and data values since 1979. 
+Ice3 is a mapping application that visualizes changes in Arctic sea ice over a 33 year period (1980-2013). The maximum August sea ice extent is shown in the timeline slider beneath the map. Additionally, an outline of the 30-year (1981-2010) median August sea ice extent is included for comparison. All data is from the National Snow and Ice Data Center (http://nsidc.org/data/seaice_index/), a source for consistently processed ice extent and concentration images and data values since 1979. A third dataset showing the average snow extent in August (1967-2004) is also included for reference.
 
-# Suite Use Case:  
-Test the unique functions of the OpenGeo Suite that differentiates it from other web mapping platforms. Specifically, we wanted to build an application that utilized map projections that are not typically used in web mapping applications, test the ability of GeoServer to render vectors in different projections  
+# Suite Use Case:
+Test the unique functions of the OpenGeo Suite that differentiates it from other web mapping platforms. Specifically, we wanted to build an application that utilized map projections that are not typically used in web mapping applications, test the ability of GeoServer to render vectors in different projections
 
 * Web Application:
   * Render map in EPSG 3408 projection.
@@ -66,3 +66,5 @@ Test the unique functions of the OpenGeo Suite that differentiates it from other
 # Artifacts:
 Most of the data and styles are checked directly into the repo. The base map is natural earth reprojected to 3408, and can be found at:
 https://docs.google.com/a/boundlessgeo.com/file/d/0ByoviHmnhuhWNkwtUy1KY1IzMVU
+
+After download, put the natural earth file in the data directory to ensure the qgis project can locate the data.
