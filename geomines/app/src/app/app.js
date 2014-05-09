@@ -8,8 +8,11 @@ var app = (function() {
   var clearedCountries = [];
   var flaggedCountries = [];
 
+  var table = window.location.search ?
+      window.location.search.substr(1) : 'countries';
+
   var minefield = new ol.source.GeoJSON({
-    url: '/geoserver/wfs?SERVICE=WFS&VERSION=1.1.0&REQUEST=GetFeature&SRSNAME=EPSG:4326&TYPENAME=geomines:setup&outputformat=application/json'
+    url: '/geoserver/wfs?SERVICE=WFS&VERSION=1.1.0&REQUEST=GetFeature&SRSNAME=EPSG:4326&TYPENAME=geomines:setup&outputformat=application/json&VIEWPARAMS=table:' + table
   });
   minefield.once('change', function() {
     minefield.forEachFeature(function(feature) {
@@ -23,6 +26,7 @@ var app = (function() {
       LAYERS: 'geomines:sweep',
       FORMAT: 'image/png8',
       STYLES: 'clear_countries',
+      VIEWPARAMS: 'table:' + table,
       FEATUREID: ','
     }
   });
@@ -33,6 +37,7 @@ var app = (function() {
       LAYERS: 'geomines:sweep',
       FORMAT: 'image/png8',
       STYLES: 'flagged_countries',
+      VIEWPARAMS: 'table:' + table,
       FEATUREID: ','
     }
   });
@@ -78,6 +83,7 @@ var app = (function() {
         params: {
           LAYERS: 'geomines:sweep',
           FORMAT: 'image/png8',
+          VIEWPARAMS: 'table:' + table,
           TILED: true
         }
       })
@@ -98,6 +104,7 @@ var app = (function() {
             LAYERS: 'geomines:sweep',
             STYLES: 'hidden_countries',
             FORMAT: 'image/png8',
+            VIEWPARAMS: 'table:' + table,
             TILED: true
           }
         })
