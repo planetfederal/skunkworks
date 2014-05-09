@@ -1,0 +1,4 @@
+curl 'https://docs.google.com/spreadsheets/d/1-IZb-iaLOm3AYmEtXh0kDJ8RJwyPlOwq046eWWdFA64/export?gid=1788872436&format=csv' > matches.csv
+curl 'https://docs.google.com/spreadsheets/d/1-IZb-iaLOm3AYmEtXh0kDJ8RJwyPlOwq046eWWdFA64/export?gid=1305948673&format=csv' > stadiums.csv
+curl 'https://docs.google.com/spreadsheets/d/1-IZb-iaLOm3AYmEtXh0kDJ8RJwyPlOwq046eWWdFA64/export?gid=766320575&format=csv' > teams.csv
+
