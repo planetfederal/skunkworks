@@ -92,7 +92,10 @@
       center: [-5049.84109515, 825838.67673878],
       zoom: 2,
       projection: projection3408
-    })
+    }),
+    interactions: ol.interaction.defaults().extend([
+      new ol.interaction.DragRotateAndZoom()
+    ])
   });
 
   // turn on the single layer that is clicked on
