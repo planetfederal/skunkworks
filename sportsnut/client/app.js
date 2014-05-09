@@ -8,6 +8,13 @@ var rewriteIcon = function(icon) {
   img.src = rewrite;
   return rewrite;
 }
+      var popup = new Boundless.Popup({
+        element: document.getElementById('popup'),
+        closeBox: true,
+        offsetY: -125,
+        autoPan: true
+      });
+
 var loadFeatures = function(response) {
   // TODO this does not work with ol.js
   var features = vector.getSource().readFeatures(response);
@@ -97,7 +104,8 @@ var layers = [
 ];
 var map = new ol.Map({
   layers: layers,
-  target: 'map',
+  overlays: [popup],
+  target: document.getElementById('map'),
   view: new ol.View2D({
     center: [-7067287.25262743, -2705645.022595205],
     zoom: 3
@@ -147,3 +155,23 @@ $('#backward').on('click', function (e) {
     vector.getSource().dispatchChangeEvent();
   }
 });
+
+      $(map.getViewport()).on('mousemove', function(evt) {
+        var pixel = map.getEventPixel(evt.originalEvent);
+        var feature = map.forEachFeatureAtPixel(pixel, function(feature, layer) {
+          return feature;
+        });
+        if (feature) {
+          popup.setPosition(feature.getGeometry().getCoordinates());
+          var html = "<table class='table table-striped table-bordered table-condensed'>";
+          html += '<tr><td>' + feature.get('team1') + ' vs ' + feature.get('team2') + '</td></tr>';
+          html += '<tr><td>' + feature.get('stadium') + '</td></tr>';
+          html += '<tr><td>' + feature.get('identifier') + '</td></tr>';
+          html += '</table>';
+          popup.setContent(html);
+          popup.show();
+        } else {
+          popup.hide();
+        }
+      });
+
