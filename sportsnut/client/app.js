@@ -1,5 +1,6 @@
 var currentDate;
 var matchDates = [];
+var cities = {};
 var rewriteIcon = function(icon) {
   icon = icon.substring(icon.lastIndexOf('/')+1).replace('.svg', '.png');
   // preload
@@ -19,6 +20,9 @@ var loadFeatures = function(response) {
     if (matchDates.indexOf(time) == -1) {
       matchDates.push(time);
     }
+    if (!(feature.get('stadium') in cities)) {
+      cities[feature.get('stadium')] = feature.getGeometry();
+    }
   }
   matchDates.sort();
   currentDate = matchDates[0];
@@ -34,8 +38,34 @@ var loadFeatures = function(response) {
     vector.getSource().dispatchChangeEvent();
   });
   vector.getSource().addFeatures(features);
+  $("#hotels").typeahead({
+    source: goog.object.getKeys(cities),
+    updater: function(item) {
+        queryCity(item);
+        return item;
+    }
+  });
 };
 
+function queryCity(name) {
+    var coord = cities[name].getFirstCoordinate();
+    $.ajax({
+       url: hotelQuery + "lat:" + coord[1] + ";" + "lon:"+ coord[0],
+       dataType: 'jsonp'
+    });
+}
+
+function loadHotels(data) {
+    $("#hotel-results").html('');
+    data.features.forEach(function(n){
+        var name = n.properties.name;
+        if (name) {
+            $("#hotel-results").append('<div>'+name+'</div>');
+        }
+    });
+}
+
+var hotelQuery = 'http://ec2-54-81-74-227.compute-1.amazonaws.com:8080/geoserver/wfs?request=getfeature&&outputformat=text/javascript&format_options=callback:loadHotels&typeName=knn_lodging&viewparams=';
 var url = 'http://ec2-54-81-74-227.compute-1.amazonaws.com:8080/geoserver/wfs?service=WFS&request=GetFeature&typename=opengeo:matchview&srsname=EPSG:3857&version=1.0.0&outputformat=text/javascript&format_options=callback:loadFeatures';
 
 $.ajax({
