@@ -74,11 +74,30 @@ List of commands:
     deploy      Deploy an application to a remote OpenGeo Suite instance.
     
 See 'suite-sdk <command> --help' for more detail on a specific command.
-
-$
 ```
 From the directory that contains this README, run the `suite-sdk` command to debug the application using our Suite's GeoServer as "local" GeoServer instance:
 ```sh
 $ suite-sdk debug -g http://localhost:8080/geoserver app
 ```
 Usually you would create a new application using the `suite-sdk create` command. In this case, we have already prepared the application, so you can go straight into debugging. The two interesting files are `index.html` and `app/app.js`. The former contains the markup of our application, the latter the JavaScript code.
+
+To deploy the application, the `suite-sdk deploy` command is used:
+```sh
+$ suite-sdk deploy app
+
+Deploying application (this may take a few moments) ...
+Buildfile: /usr/local/opengeo/sdk/build.xml
+
+checkpath:
+
+build:
+
+package:
+Building war: /var/folders/d4/b721gqhj1wd6ck4zrbth7_2w0000gn/T/suite-sdk/build/app.war
+
+deploy:
+Deploying application (disregard message about undeployment failure if this is the first deployment)
+
+The 'suite-sdk deploy' command failed.
+```
+The command failed because we did not provide any credentials or target for a remote server. But we did get the generated `/var/folders/d4/b721gqhj1wd6ck4zrbth7_2w0000gn/T/suite-sdk/build/app.war` file, which we copied straight to our server's webapps directory using `scp`.
