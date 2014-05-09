@@ -64,11 +64,11 @@ Data
 GeoServer Layers
 ================
 
-- Add a layer named `wsa_rivers` referencing the wsa_rivers table
-- Use the `wsa_layers.sld` to style the layer
-- Add a layer named `wsa_downstream` and make it a SQL view layer
+- Add a layer named ``wsa_rivers`` referencing the wsa_rivers table
+- Use the ``wsa_layers.sld`` to style the layer
+- Add a layer named ``wsa_downstream`` and make it a SQL view layer
 - Use the CTE SQL below to fill in the layer definition
-- Use the `wsa_downstream.sld` to style the layer
+- Use the ``wsa_downstream.sld`` to style the layer
 
 
 CTE SQL Queries
