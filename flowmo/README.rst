@@ -47,6 +47,10 @@ Kevin Lessons
 Gabriel Lessons
 ---------------
 
+- Remember not to use workspace local styles. Or fix the integrated GWC.
+- No real easy way to work with SLD
+- JQuery rocks 
+
 
 
 Data
