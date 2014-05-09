@@ -5,11 +5,11 @@
 var app = (function() {
 
   var featuresByFid = {};
-  var clear = {};
+  var clearedCountries = [];
   var flaggedCountries = [];
 
   var minefield = new ol.source.GeoJSON({
-    url: '/geoserver/wfs?SERVICE=WFS&VERSION=1.1.0&REQUEST=GetFeature&SRSNAME=EPSG:3857&TYPENAME=geomines:setup&outputformat=application/json'
+    url: '/geoserver/wfs?SERVICE=WFS&VERSION=1.1.0&REQUEST=GetFeature&SRSNAME=EPSG:4326&TYPENAME=geomines:setup&outputformat=application/json'
   });
   minefield.once('change', function() {
     minefield.forEachFeature(function(feature) {
@@ -17,18 +17,21 @@ var app = (function() {
     });
   });
 
-  var hidden = new ol.source.ImageWMS({
+  var cleared = new ol.source.ImageWMS({
     url: '/geoserver/wms',
     params: {
-      LAYERS: 'geomines:countries',
-      STYLES: 'hidden_countries'
+      LAYERS: 'geomines:sweep',
+      FORMAT: 'image/png8',
+      STYLES: 'clear_countries',
+      FEATUREID: ','
     }
   });
 
   var flagged = new ol.source.ImageWMS({
     url: '/geoserver/wms',
     params: {
-      LAYERS: 'geomines:countries',
+      LAYERS: 'geomines:sweep',
+      FORMAT: 'image/png8',
       STYLES: 'flagged_countries',
       FEATUREID: ','
     }
@@ -46,16 +49,6 @@ var app = (function() {
     return minedNeighbours;
   }
 
-  function getHidden() {
-    var hidden = [];
-    for (var fid in featuresByFid) {
-      if (!clear[fid]) {
-        hidden.push(fid);
-      }
-    }
-    return hidden;
-  }
-
   function flag(fid) {
     var index = flaggedCountries.indexOf(fid);
     if (index == -1) {
@@ -69,11 +62,11 @@ var app = (function() {
   function reveal(fids) {
     for (var i = fids.length - 1; i >= 0; --i) {
       var fid = fids[i];
-      if (!clear[fid] && !featuresByFid[fid].get('mined')) {
-        clear[fid] = true;
+      if (!featuresByFid[fid].get('mined') && clearedCountries.indexOf(fid) == -1) {
+        clearedCountries.push(fid);
       }
     }
-    hidden.updateParams({FEATUREID: getHidden().join(',') + ','});
+    cleared.updateParams({FEATUREID: clearedCountries.join(',') + ','});
     minefield.dispatchChangeEvent();
   }
 
@@ -83,7 +76,9 @@ var app = (function() {
       source: new ol.source.TileWMS({
         url: '/geoserver/wms',
         params: {
-          LAYERS: 'geomines:countries'
+          LAYERS: 'geomines:sweep',
+          FORMAT: 'image/png8',
+          TILED: true
         }
       })
     }));
@@ -91,22 +86,24 @@ var app = (function() {
 
   var map = new ol.Map({
     view: new ol.View2D({
+      projection: 'EPSG:4326',
       center: [0, 0],
       zoom: 2
     }),
     layers: [
-      new ol.layer.Image({
-        source: new ol.source.ImageWMS({
+      new ol.layer.Tile({
+        source: new ol.source.TileWMS({
           url: '/geoserver/wms',
           params: {
-            LAYERS: 'geomines:countries',
-            STYLES: 'clear_countries',
+            LAYERS: 'geomines:sweep',
+            STYLES: 'hidden_countries',
+            FORMAT: 'image/png8',
             TILED: true
           }
         })
       }),
       new ol.layer.Image({
-        source: hidden
+        source: cleared
       }),
       new ol.layer.Image({
         source: flagged
@@ -116,7 +113,7 @@ var app = (function() {
         style: (function() {
           var styleCache = {};
           return function(feature, resolution) {
-            var text = clear[feature.get('fid')] ?
+            var text = clearedCountries.indexOf(feature.get('fid')) > - 1 ?
                 (getMinedNeighbours(feature).length || '') + '' : '';
             if (!styleCache[text]) {
               styleCache[text] = [new ol.style.Style({
@@ -142,46 +139,40 @@ var app = (function() {
     target: 'map'
   });
 
+  var popup = new ol.Overlay({
+    element: document.getElementById('popup')
+  });
+  map.addOverlay(popup);
+
   var featureOverlay = new ol.FeatureOverlay({
     map: map,
-    style: (function() {
-      var styleCache = {};
-      return function(feature, resolution) {
-        var text = '(' + feature.get('count') + ')';
-        if (!styleCache[text]) {
-          styleCache[text] = [new ol.style.Style({
-            stroke: new ol.style.Stroke({color: 'blue'}),
-            text: new ol.style.Text({
-              font: '12px Calibri,sans-serif',
-              text: '(' + feature.get('count') + ')',
-              offsetX: 10,
-              offsetY: 10,
-              fill: new ol.style.Fill({
-                color: '#000'
-              }),
-              stroke: new ol.style.Stroke({
-                color: '#fff',
-                width: 3
-              })
-            })
-          })];
-        }
-        return styleCache[text];
-      };
-    }())
+    style: new ol.style.Style({
+      stroke: new ol.style.Stroke({color: 'blue'}),
+      fill: new ol.style.Fill({color: 'rgba(0,0,255,0.05)'})
+    })
   });
 
   var highlight;
+  var element = popup.getElement();
   map.on('pointermove', function(evt) {
     var feature = map.forEachFeatureAtPixel(evt.pixel, function(f) {
       return f;
     });
+    popup.setPosition(evt.coordinate);
     if (feature !== highlight) {
+      $(element).tooltip('destroy');
       if (highlight) {
-        featureOverlay.removeFeature(highlight);
+        featureOverlay.getFeatures().clear();
       }
       if (feature) {
-        featureOverlay.addFeature(feature);
+        var neighbours = feature.get('neighbours').split(',');
+        for (var i = neighbours.length - 1; i >= 0; --i) {
+          featureOverlay.addFeature(featuresByFid[neighbours[i]]);
+        }
+        $(element).tooltip({title: feature.get('count')});
+        $(element).tooltip('show');
+      } else {
+        $(element).tooltip('hide');
       }
       highlight = feature;
     }
