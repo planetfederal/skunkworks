@@ -11,6 +11,7 @@ var app = (function() {
   var featuresByFid = {};
   var clearedCountries = [];
   var flaggedCountries = [];
+  var minedCountries = [];
 
   function getMinedNeighbours(feature) {
     var neighbours = feature.get('neighbours').split(',');
@@ -32,6 +33,18 @@ var app = (function() {
       flaggedCountries.splice(index, 1);
     }
     flagged.updateParams({FEATUREID: flaggedCountries.join(',') + ','});
+    if (flaggedCountries.length == minedCountries.length) {
+      var won = true;
+      for (var i = minedCountries.length - 1; i >= 0; --i) {
+        if (flaggedCountries.indexOf(minedCountries[i]) == -1) {
+          won = false;
+          break;
+        }
+      }
+      if (won) {
+        alert('Congrats, you won!');
+      }
+    }
   }
 
   function reveal(fids) {
@@ -68,7 +81,11 @@ var app = (function() {
     map.getView().fitExtent(minefield.getExtent(), map.getSize());
     map.getLayers().forEach(function(l) { l.setVisible(true); });
     minefield.forEachFeature(function(feature) {
-      featuresByFid[feature.get('fid')] = feature;
+      var fid = feature.get('fid');
+      if (feature.get('mined')) {
+        minedCountries.push(fid);
+      }
+      featuresByFid[fid] = feature;
     });
   });
 
