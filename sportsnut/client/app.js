@@ -193,7 +193,7 @@ $('#backward').on('click', function (e) {
         });
         if (feature) {
           popup.setPosition(feature.getGeometry().getCoordinates());
-          var html = "<table class='table table-striped table-bordered table-condensed'>";
+          var html = "<table class='table table-bordered'>";
           html += '<tr><td>' + feature.get('team1') + ' vs ' + feature.get('team2') + '</td></tr>';
           html += '<tr><td>' + feature.get('stadium') + '</td></tr>';
           html += '<tr><td>' + feature.get('identifier') + '</td></tr>';
