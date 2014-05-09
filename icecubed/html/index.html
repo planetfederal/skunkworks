@@ -38,6 +38,10 @@
         <div class="container">
           <div id="map"></div>
           <div id="legend"><img src="img/legend.png"></div>
+          <label for="cryo" class="snowfall">
+              <input id="cryo" type="checkbox" value="cryo" checked="checked">
+              Average Snow Extent
+            </label>
         </div> <!-- #main -->
     </div> <!-- #main-container -->
 
@@ -81,18 +85,8 @@
               <input id="extent_N_201308_polygon" name="options" type="radio">
               <label for="extent_N_201308_polygon">2013</label>
             </div>
-
-            <label for="cryo">
-              <input id="cryo" type="checkbox" value="cryo" checked="checked">
-              Average Snow Extent
-            </label>
         </footer>
     </div>
-
-<div id="popup">
-  Testing 123 <p>testing</p><h3>testing</h3>
-</div>
-
 </div>
 
 
@@ -106,28 +100,7 @@
     $(document).ready( function(){
         $("#radios").radiosToSlider();
     });
-</script>
-
-<script src="js/blurbox.js"></script>
-<script>
-  $(document).ready(function(){
-    $("#title").click(function() {
-      $("div#popup").css("z-index", "100");
-      $("div#popup").addClass("show");
-  var bb = $('#popup').blurbox({blur: 10, animateBlur: true, width: 500, bgColor: 'rgba(255,255,0,0.2)'})
-  bb.show();
-      return false;
-    });
-    $("#closemodal").click(function() {
-      $("div#popup").css("z-index", "-1");
-      $("div#popup").removeClass("show");
-      return false;
-    });
-  });
-
-
-</script>
-
+</script> 
 
 <!-- Misc -->
 <script src="js/main.js"></script>
