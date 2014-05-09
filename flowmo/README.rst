@@ -8,6 +8,14 @@ Victor M.
 Gabriel R.
 
 
+PAUL LESSONS
+------------
+
+- CTE SQL is not fast enough to dynamically walk large networks
+- SQL rules are verbose (already knew that)
+- Attractive rendering is possible to achieve
+- GeoServer labelling engine is really good
+
 
 DATA
 ====
@@ -69,6 +77,34 @@ WSA_AFFECTED
   FROM wls_pdl_sp_point JOIN downstream ON ST_DWithin(downstream.geom, wls_pdl_sp_point.wkb_geometry, %radius%)
   WHERE lic_status = 'CURRENT'
 
+
+WSA_DOWNSTREAM_VECTOR
+---------------------
+
+.. code-block::sql
+
+  WITH RECURSIVE downstream(gidlist, gid, geom, trmmdwtrsh) AS (
+    SELECT ARRAY[gid] as gidlist, gid, geom, trmmdwtrsh FROM wsa_rivers WHERE gid = 885367
+  UNION ALL
+    SELECT array_append(d.gidlist, r.gid) AS gidlist, r.gid, r.geom, r.trmmdwtrsh
+    FROM downstream d, wsa_rivers r
+    WHERE d.geom && r.geom
+    AND ST_Equals(ST_StartPoint(ST_GeometryN(d.geom,1)),ST_EndPoint(ST_GeometryN(r.geom,1)))
+    AND NOT d.gidlist @> ARRAY[r.gid]
+  )
+  SELECT ST_LineMerge(ST_Collect(geom)) FROM downstream;
+
+
+WSA_AFFECTED_VECTOR
+-------------------
+
+.. code-block::sql
+
+  SELECT ogc_fid, wkb_geometry, licence_no, purpose, strm_name, licensee, ddrssln1, ddrssln2
+  FROM wls_pdl_sp_point 
+  WHERE ST_DWithin(wkb_geometry, 
+    ST_SetSRID(ST_GeomFromGeoJSON('{"type":"LineString","coordinates":[[1180037.25,407540.750000003],[1179940.625,407511.718999996]]}'),3005), 500)
+  AND lic_status = 'CURRENT';
 
 
 INTERFACE
