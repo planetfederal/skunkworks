@@ -79,8 +79,17 @@ GeoServer Layers
 - Add a layer named ``wsa_rivers`` referencing the wsa_rivers table
 - Use the ``wsa_layers.sld`` to style the layer
 - Add a layer named ``wsa_downstream`` and make it a SQL view layer
-- Use the CTE SQL below to fill in the layer definition
-- Use the ``wsa_downstream.sld`` to style the layer
+  - Use the wsa_downstream CTE SQL to fill in the layer definition
+  - Use the ``wsa_downstream.sld`` to style the layer
+- Add a layer named ``wsa_downstream_vector`` and make it a SQL view layer
+  - Use the wsa_downstream_vector CTE SQL to fill in the layer definition
+  - Use the ``wsa_downstream.sld`` to style the layer
+- Add a layer named ``wsa_affected`` and make it a SQL view layer
+  - Use the wsa_affected CTE SQL to fill in the layer definition
+  - Use the ``wsa_affected.sld`` to style the layer
+- Add a layer named ``wsa_affected_vector`` and make it a SQL view layer
+  - Use the wsa_affected_vector CTE SQL to fill in the layer definition
+  - Use the ``wsa_affected.sld`` to style the layer
 
 
 CTE SQL Queries
