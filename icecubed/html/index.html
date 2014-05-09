@@ -29,7 +29,7 @@
 <div class="main-container">
     <div class="header wrapper">
         <header class="container">
-            <h1 class="title">Ice³</h1>
+            <h1 class="title" id="title">Ice³</h1>
             <img src="img/iceberg-large.png" alt="iceberg">
         </header>
     </div>
@@ -83,7 +83,13 @@
             </div>
         </footer>
     </div>
+
+<div id="popup">
+  Testing 123 <p>testing</p><h3>testing</h3>
 </div>
+
+</div>
+
 
 <!-- jQuery -->
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
@@ -96,6 +102,27 @@
         $("#radios").radiosToSlider();
     });
 </script>
+
+<script src="js/blurbox.js"></script>
+<script>
+  $(document).ready(function(){
+    $("#title").click(function() {
+      $("div#popup").css("z-index", "100");
+      $("div#popup").addClass("show");
+  var bb = $('#popup').blurbox({blur: 10, animateBlur: true, width: 500, bgColor: 'rgba(255,255,0,0.2)'})
+  bb.show();
+      return false;
+    });
+    $("#closemodal").click(function() {
+      $("div#popup").css("z-index", "-1");
+      $("div#popup").removeClass("show");
+      return false;
+    });
+  });
+
+
+</script>
+
 
 <!-- Misc -->
 <script src="js/main.js"></script>

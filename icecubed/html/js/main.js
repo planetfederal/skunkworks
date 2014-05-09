@@ -1,7 +1,7 @@
 (function() {
 
   // TODO need to explicitly set map height?
-  document.getElementById('map').style.height = '500px';
+  // document.getElementById('map1123  //   //   // ').style.height = '500px';
 
   var extent3408 = [
     -4938036.174191093,

@@ -128,21 +128,44 @@ body {
 
 /* map responsive */
 
+.touch .ol-zoom { display: none; }
+
 .map {
   .container { 
     position: relative;
     height: 0;
-    padding-bottom: 45%;
+    padding-bottom: 48%;
     #map {
       position: absolute;
       top: 0; 
       left: 0;
       width: 100%;
       height: 100%;
+      .ol-zoom {
+        position: absolute;
+        bottom: 25px;
+        left: 25px;
+        .ol-zoom-in,
+        .ol-zoom-out {
+          background: none;
+          text-indent: -9999px;
+          border: 0;
+          display: block;
+          height: 40px;
+          width: 40px;
+          outline: 0;
+        }
+        .ol-zoom-in {
+          background-image: url('../img/zoom-in.png');
+        }
+        .ol-zoom-out {
+          background-image: url('../img/zoom-out.png');
+        }
+      }
     }
     #legend {
       position: absolute;
-      bottom: 62px; 
+      bottom: 25px; 
       right: 25px;
       opacity: 0.7;
       img {
@@ -172,19 +195,48 @@ body {
       width: 100%;
       height: 100%;
 
+      #legend {
+        .transform(scale(0.75));
+        top: -50px;
+        right: 0px;
+        bottom: inherit;
+        opacity: 0.95;
+      }
     }
   }
-  .footer .container { 
+  .footer { 
     position: absolute;
     bottom: 35px;
+    left: 0;
+    margin: 0;
+    padding: 0;
     width: 100%;
-    .transform(scale(0.75));
-    #radios {
-      margin: 0 auto; 
-    }
+    .container { 
+      width: 100%;
+     }
    }
 }
 
+@media only screen and (max-width: 400px)
+ { 
+  .footer { 
+    .transform(scale(0.38));
+    .container { 
+      .translate(-72%,0);
+     }
+   }
+}
+
+@media only screen and (min-width: 401px) and (max-width: 500px)
+ { 
+  .footer { 
+    .transform(scale(0.58));
+    bottom: -6px;
+    .container { 
+      .translate(-33%,0);
+     }
+   }
+}
 
 /* Slider */
 .radios-to-slider{
@@ -284,4 +336,13 @@ body {
   -moz-border-radius:25px;
   -o-border-radius:25px;
   border-radius:25px;
+}
+
+.blurbox-wrapper {
+  width: 500px;
+  height: auto;
+  padding: 42px;
+  color: #555;
+  h1 { font-size: 32px; }
+  p { font-size: 12px;}
 }
