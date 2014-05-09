@@ -1,3 +1,9 @@
+Purpose
+=======
+
+Given a stream network, can we take a user input (click), figure out what portions of the network are downstream of the click, and what water users would be affected by a contamination introduced into the network at that point?
+
+
 Team
 ====
 
