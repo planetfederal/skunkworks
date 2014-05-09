@@ -104,7 +104,7 @@ vector.getSource().on('change', function(evt) {
   $('#wmstime').slider('setValue', newValue);
 });
 var timer;
-var frameRate = 2;
+var frameRate = 1;
 $('#play').on('click', function (e) {
   timer = window.setInterval(function() {
     var idx = matchDates.indexOf(currentDate);
