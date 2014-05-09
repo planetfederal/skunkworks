@@ -34,6 +34,7 @@ Michael Lessons
 
 - Small AWS instances are far too resource constrained for even the most simple production use
 - GeoServer needs a GeoScript WPS workflow
+- We should be eating our own dogfood more often
 - One can get a .servebeer.com domain for free!
 
 
