@@ -205,3 +205,12 @@ $('#backward').on('click', function (e) {
         }
       });
 
+      map.on('singleclick', function(evt) {
+        var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+          return feature;
+        });
+        if (feature) {
+          $("#hotels").val(feature.get('stadium'));
+          queryCity(feature.get('stadium'));
+        }
+      });
