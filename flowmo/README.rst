@@ -1,11 +1,11 @@
 TEAM
 ====
 
-Michael W.
-Kevin S.
-Paul R.
-Victor M.
-Gabriel R.
+- Michael W.
+- Kevin S.
+- Paul R.
+- Victor M.
+- Gabriel R.
 
 
 PAUL LESSONS
@@ -40,10 +40,10 @@ GABRIEL LESSONS
 DATA
 ====
 
-BC WSA data from
-http://data.gov.bc.ca
+- BC WSA data from http://data.gov.bc.ca
+- Info page: http://www.data.gov.bc.ca/dbc/catalogue/detail.page?config=dbc&P110=recorduid:173912&recorduid=173912&title=WSA%20-%20STREAM%20CENTRELINE%20NETWORK%20(50,000)
 
-http://www.data.gov.bc.ca/dbc/catalogue/detail.page?config=dbc&P110=recorduid:173912&recorduid=173912&title=WSA%20-%20STREAM%20CENTRELINE%20NETWORK%20(50,000)
+::
 
   shp2pgsql -W LATIN1 -s 3005 -D -I -i -S WSA_SL_SVW_line.shp wsa_rivers | psql rivers
 
@@ -51,10 +51,10 @@ http://www.data.gov.bc.ca/dbc/catalogue/detail.page?config=dbc&P110=recorduid:17
   CLUSTER wsa_rivers USING wsa_rivers_geom_gist;
 
 
-BC Points of Diversion with Water Licence Information from
-http://data.gov.bc.ca
+- BC Points of Diversion with Water Licence Information from http://data.gov.bc.ca
+- Info page: http://www.data.gov.bc.ca/dbc/catalogue/detail.page?config=dbc&P110=recorduid:173495&recorduid=173495&title=BC%20Points%20of%20Diversion%20with%20Water%20Licence%20Information
 
-http://www.data.gov.bc.ca/dbc/catalogue/detail.page?config=dbc&P110=recorduid:173495&recorduid=173495&title=BC%20Points%20of%20Diversion%20with%20Water%20Licence%20Information
+::
 
   ogr2ogr --config PG_USE_COPY YES -f PGDump points_of_diversion.sql WLS_PDL_SP_point.shp
   
@@ -66,7 +66,8 @@ CTE SQL Queries
 WSA_DOWNSTREAM
 --------------
 
-.. code-block:: sql
+::
+
    WITH RECURSIVE downstream(gidlist, gid, geom, trmmdwtrsh) AS (
      SELECT ARRAY[gid] as gidlist, gid, geom, trmmdwtrsh FROM wsa_rivers WHERE gid = %gid%
    UNION ALL
@@ -82,7 +83,7 @@ WSA_DOWNSTREAM
 WSA_AFFECTED
 ------------
 
-.. code-blocks:: sql
+::
 
   WITH RECURSIVE downstream(gidlist, gid, geom, trmmdwtrsh) AS (
     SELECT ARRAY[gid] as gidlist, gid, geom, trmmdwtrsh FROM wsa_rivers WHERE gid = %gid%
@@ -101,7 +102,7 @@ WSA_AFFECTED
 WSA_DOWNSTREAM_VECTOR
 ---------------------
 
-.. code-block::sql
+::
 
   WITH RECURSIVE downstream(gidlist, gid, geom, trmmdwtrsh) AS (
     SELECT ARRAY[gid] as gidlist, gid, geom, trmmdwtrsh FROM wsa_rivers WHERE gid = 885367
@@ -118,7 +119,7 @@ WSA_DOWNSTREAM_VECTOR
 WSA_AFFECTED_VECTOR
 -------------------
 
-.. code-block::sql
+::
 
   SELECT ogc_fid, wkb_geometry, licence_no, purpose, strm_name, licensee, ddrssln1, ddrssln2
   FROM wls_pdl_sp_point 
