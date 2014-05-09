@@ -1,5 +1,7 @@
 # Minesweeper goes Geo
 
+This game app was developed by @sbalasub, @jmarin, @dwins, @bosth and @ahocevar during the Boundles Spring Kickoff in May 2014 in New Orleans.
+
 ## 1. Data download and preparation
 
 
