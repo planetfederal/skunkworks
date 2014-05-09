@@ -108,9 +108,9 @@ var view = new ol.View2D({
   zoom: zoom
 });
 
-var riverSource = new ol.source.ImageWMS({
+var riverSource = new ol.source.TileWMS({
   url: baseUrl + '/geoserver/wms',
-  params: {'LAYERS': 'boundless:wsa_rivers'},
+  params: {'LAYERS': 'boundless:wsa_rivers', 'TILED': true},
   hidpi: false,
   serverType: 'geoserver'
 });
@@ -166,7 +166,7 @@ var map = new ol.Map({
         url: 'http://{a-c}.tiles.mapbox.com/v3/nps.2yxv8n84/{z}/{x}/{y}.png'
       })
     }),
-    new ol.layer.Image({
+    new ol.layer.Tile({
       source: riverSource
     }),
     downstreamLayer,
