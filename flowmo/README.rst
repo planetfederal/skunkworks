@@ -18,7 +18,7 @@ Paul Lessons
 ------------
 
 - CTE SQL is not fast enough to dynamically walk large networks
-- SQL rules are verbose (already knew that)
+- SLD rules are verbose (already knew that)
 - SLD elements are order dependent
 - Attractive rendering is possible to achieve
 - GeoServer labelling engine is really good
