@@ -1,6 +1,92 @@
+
+
 //var baseUrl = 'http://ec2-75-101-218-208.compute-1.amazonaws.com:8080';
 var baseUrl = 'http://localhost:8000/gs'
 
+var wfsUrl = baseUrl + '/geoserver/wfs';
+
+function downstreamStyles(feature, res) {
+  return [new ol.style.Style({
+    fill: new ol.style.Fill({
+      color: '#42A1E0'
+    }),
+    stroke: new ol.style.Stroke({
+      color: '#990000',
+      width: 5
+    })
+  })];
+}
+/*
+function getAffectedFeatures(gid) {
+  var params = {
+    service: 'wfs',
+    version: '2.0.0',
+    request: 'GetFeature',
+    typeName: 'boundless:wsa_affected',
+    outputFormat: 'application/json',
+    viewparams: 'gid:' + gid
+  };
+  console.log($.param(params));
+  $.get(wfsUrl, params, function(res) {
+    console.log(res);
+  });
+}
+*/
+function getDownstreamFeaturesLayer(gid) {
+  var params = {
+    service: 'wfs',
+    version: '2.0.0',
+    request: 'GetFeature',
+    typeName: 'boundless:wsa_downstream_vector',
+    outputFormat: 'application/json',
+    srsname: 'EPSG:3857',
+    viewparams: 'gid:' + gid
+  };
+
+  $.get(wfsUrl, params, function(res) {
+    console.log('res', res);
+    var source = new ol.source.GeoJSON({
+        object: res
+    });
+    source.on('addfeature', function(feature) {
+      console.log('downstream feature added');
+    });
+    vectorLayer = new ol.layer.Vector({
+      source: source,
+      style: downstreamStyles,
+      visible: true
+    });
+    map.addLayer(vectorLayer);
+
+    //getAffectedFeaturesLayer(res);
+  })
+}
+/*
+function getAffectedFeaturesLayer(geojson) {
+  var params = {
+    service: 'wfs',
+    version: '2.0.0',
+    request: 'GetFeature',
+    typeName: 'boundless:wsa_affected_vector',
+    outputFormat: 'application/json',
+    srsname: 'EPSG:3857',
+    viewparams: 'json:' + JSON.stringify(geojson)
+  };
+  $.post(wfsUrl, JSON.stringify(geojson), function(res) {
+    var source = new ol.source.GeoJSON({
+        url: wfsUrl + '?' + $.param(params)
+    });
+    source.on('addfeature', function(feature) {
+      console.log('affected feature added');
+    });
+    map.addLayer(new ol.layer.Vector({
+      source: source,
+      style: downstreamStyles,
+      visible: true
+    }));
+  });
+}
+*/
 var lon = -13772294,
     lat = 6237567;
 var zoom = 10;
@@ -51,18 +137,25 @@ var affectedLayer = new ol.layer.Image({
   visible: false
 });
 
+var vectorLayer;
+
 function updateStream(gid) {
-  console.log(gid);
   if (gid) {
-    console.log(gid);
     gid = gid.split('.')[1];
-    console.log(gid);
     downstreamSource.updateParams({'viewparams': 'gid:' + gid});
     affectedSource.updateParams({'viewparams': 'gid:' + gid});
-    downstreamLayer.setVisible(true);
+
+    if (vectorLayer) {
+      map.removeLayer(vectorLayer);
+    }
+    getDownstreamFeaturesLayer(gid);
+
+    //downstreamLayer.setVisible(true);
     affectedLayer.setVisible(true);
+    //getAffectedFeatures(gid);
   }
 }
+
 var map = new ol.Map({
   controls: ol.control.defaults().extend([mousePositionControl]),
   layers: [
@@ -103,7 +196,7 @@ function selectRiver(evt) {
   mapEl.removeClass('crosshair');
   btn.removeClass('toggled');
 }
-console.log(map);
+
 
 btn.on('click', function() {
   if (btn.hasClass('toggled')) {
@@ -115,4 +208,20 @@ btn.on('click', function() {
     btn.addClass('toggled');
     map.once('singleclick', selectRiver);
   }
-}); 
+});
+
+
+function createFeatureList(features) {
+  if (features) {
+    // clear existing contents
+    var featureList = $('.feature-list').html('');
+
+    // Add feature items
+    var items = features.map(function(feature) {
+      return $('li').addClass('feature-list-item')
+                    .html(feature.properties.ddrssln1);
+    });
+
+    featureList.append(items);
+  }
+}
