@@ -1,10 +1,16 @@
 var currentDate;
 var matchDates = [];
+var rewriteIcon = function(icon) {
+  icon = icon.substring(icon.lastIndexOf('/')+1).replace('.svg', '.png');
+  return 'http://ec2-54-81-74-227.compute-1.amazonaws.com:8080/geoserver/styles/sportsnut/' + icon;
+}
 var loadFeatures = function(response) {
   // TODO this does not work with ol.js
   var features = vector.getSource().readFeatures(response);
   for (var i=0, ii=features.length; i<ii; ++i) {
     var feature = features[i];
+    feature.set('icon1', rewriteIcon(feature.get('icon1')));
+    feature.set('icon2', rewriteIcon(feature.get('icon2')));
     var time = Date.parse(feature.get('time'));
     if (matchDates.indexOf(time) == -1) {
       matchDates.push(time);
