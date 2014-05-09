@@ -18,20 +18,22 @@ Using PgAdmin or pgsql make sure you enable the Postgis extension: ```create ext
 
 ## 2. Load data into PostGIS
 
-- GeoMines requires a polygon or multipolygon data set to be loaded into a PostGIS database named ``geomines``::
+- GeoMines requires a polygon or multipolygon data set to be loaded into a PostGIS database named ``geomines``:
 
-     createdb geomines
-     psql -c "CREATE EXTENSION postgis;" geomines
+```
+createdb geomines
+psql -c "CREATE EXTENSION postgis;" geomines
+```
 
 - The only requirement is that there is a Geometry column named ``geom`` and a primary key named ``fid``.
 
-- We have loaded three game maps into our database for the demo: ``states``, ``contries`` and ``nybb``::
+- We have loaded three game maps into our database for the demo: ``states``, ``contries`` and ``nybb``:
 
-    shp2pgsql countries.shp | psql -U postgres geomines
+    ``shp2pgsql countries.shp | psql -U postgres geomines``
 
-- To rename a column to meet the requirements::
+- To rename a column to meet the requirements:
 
-    ALTER TABLE countries RENAME COLUMN the_geom TO geom;
+    ``ALTER TABLE countries RENAME COLUMN the_geom TO geom;``
 
 ## 3. GeoServer services creation
 
@@ -39,21 +41,23 @@ Using PgAdmin or pgsql make sure you enable the Postgis extension: ```create ext
 
 - Create a PostGIS store that connects to the ``geomines`` database. Ensure that "Expose Primary Keys" is checked.
 
-- Publish layer named ``setup``. It will be the following SQL view::
+- Publish layer named ``setup``. It will be the following SQL view:
 
-     SELECT 
-       a.fid, 
-       count(a.fid), 
-       a.geom,
-       array_to_string(array_agg(b.fid), ',') AS neighbours,
-       CASE WHEN random() < %field% THEN true ELSE false END AS mined
-      FROM 
-       %table% AS a, 
-       %table% AS b 
-     WHERE 
-       a <> b AND 
-       ST_Intersects(a.geom, b.geom) 
-     GROUP BY a.fid
+```
+SELECT 
+  a.fid, 
+  count(a.fid), 
+  a.geom,
+  array_to_string(array_agg(b.fid), ',') AS neighbours,
+  CASE WHEN random() < %field% THEN true ELSE false END AS mined
+ FROM 
+  %table% AS a, 
+  %table% AS b 
+WHERE 
+  a <> b AND 
+  ST_Intersects(a.geom, b.geom) 
+GROUP BY a.fid
+```
 
    The view will return the ``fid`` and geometry of each feature that has a land border with another feature (``ST_Intersects``). Additionally, we will receive the count of countries that are bordered and a comma-separated list of ``fid``s of the bordering features. Finally, the ``mined`` attribute will contain a boolean indicating whether there is a mine or not.
 
