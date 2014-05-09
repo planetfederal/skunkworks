@@ -138,7 +138,7 @@ var map = new ol.Map({
   target: document.getElementById('map'),
   view: new ol.View2D({
     center: [-7067287.25262743, -2705645.022595205],
-    zoom: 3
+    zoom: 4
   })
 });
 vector.getSource().on('change', function(evt) {
