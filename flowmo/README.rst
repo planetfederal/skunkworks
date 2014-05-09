@@ -18,6 +18,25 @@ PAUL LESSONS
 - GeoServer labelling engine is really good
 
 
+VICTOR LESSONS
+--------------
+
+
+
+MICHAEL LESSONS
+---------------
+
+
+KEVIN LESSONS
+-------------
+
+
+
+GABRIEL LESSONS
+---------------
+
+
+
 DATA
 ====
 
