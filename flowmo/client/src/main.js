@@ -1,13 +1,13 @@
-//var baseUrl = 'http://ec2-54-221-78-168.compute-1.amazonaws.com:8080';
+//var baseUrl = 'http://ec2-75-101-218-208.compute-1.amazonaws.com:8080';
 var baseUrl = 'http://localhost:8000/gs'
 
-var lon = -15323025,
-    lat = 8461731;
-var zoom = 12;
+var lon = -13772294,
+    lat = 6237567;
+var zoom = 10;
 
 var mousePositionControl = new ol.control.MousePosition({
   coordinateFormat: ol.coordinate.createStringXY(4),
-  projection: 'EPSG:4326',
+  projection: 'EPSG:3857',
   // comment the following two lines to have the mouse position
   // be placed within the map.
   className: 'custom-mouse-position',
@@ -20,22 +20,47 @@ var view = new ol.View2D({
   zoom: zoom
 });
 
-var riverSource = new ol.source.TileWMS({
+var riverSource = new ol.source.ImageWMS({
   url: baseUrl + '/geoserver/wms',
-  params: {'LAYERS': 'boundless:rivers', 'TILED': true},
+  params: {'LAYERS': 'boundless:wsa_rivers'},
   hidpi: false,
   serverType: 'geoserver'
 });
 
 var downstreamSource = new ol.source.ImageWMS({
   url: baseUrl + '/geoserver/wms',
-  params: {'LAYERS': 'boundless:downstream'},
+  params: {'LAYERS': 'boundless:wsa_downstream'},
   serverType: 'geoserver'
 });
 
-function updateStream(from) {
-  if (from) {
-    downstreamSource.updateParams({'viewparams': 'from_junct:' + from});
+var affectedSource = new ol.source.ImageWMS({
+  url: baseUrl + '/geoserver/wms',
+  params: {'LAYERS': 'boundless:wsa_affected'},
+  serverType: 'geoserver'
+});
+
+
+var downstreamLayer = new ol.layer.Image({
+  source: downstreamSource,
+  visible: false
+});
+
+
+var affectedLayer = new ol.layer.Image({
+  source: affectedSource,
+  visible: false
+});
+
+function updateStream(gid) {
+  console.log(gid);
+  if (gid) {
+    console.log(gid);
+    gid = gid.split('.')[1];
+    console.log(gid);
+    downstreamSource.updateParams({'viewparams': 'gid:' + gid});
+    affectedSource.updateParams({'viewparams': 'gid:' + gid});
+    downstreamLayer.setVisible(true);
+    affectedLayer.setVisible(true);
   }
 }
 var map = new ol.Map({
@@ -46,12 +71,11 @@ var map = new ol.Map({
         url: 'http://{a-c}.tiles.mapbox.com/v3/nps.2yxv8n84/{z}/{x}/{y}.png'
       })
     }),
-    new ol.layer.Tile({
+    new ol.layer.Image({
       source: riverSource
     }),
-    new ol.layer.Image({
-      source: downstreamSource
-    })
+    downstreamLayer,
+    affectedLayer
   ],
   target: 'map',
   view: view
@@ -60,7 +84,10 @@ var map = new ol.Map({
 
 var viewProjection = view.getProjection();
 var btn = $('.go-btn');
+var mapEl = $('#map');
+
 function selectRiver(evt) {
+  console.log('Clicked');
   document.getElementById('info').innerHTML = '';
   var viewResolution = /** @type {number} */ (view.getResolution());
   var url = riverSource.getGetFeatureInfoUrl(
@@ -70,15 +97,22 @@ function selectRiver(evt) {
   $.get(url, function(res) {
     console.log(res);
     if (res && res.features) {
-      updateStream(res.features[0].properties.from_junct);
+      updateStream(res.features[0].id);
     }
   });
-
+  mapEl.removeClass('crosshair');
   btn.removeClass('toggled');
 }
-
+console.log(map);
 
 btn.on('click', function() {
-  btn.addClass('toggled');
-  map.once('singleclick', selectRiver);
+  if (btn.hasClass('toggled')) {
+    mapEl.removeClass('crosshair');
+    btn.removeClass('toggled');
+    map.un('singleclick', selectRiver);
+  } else {
+    mapEl.addClass('crosshair');
+    btn.addClass('toggled');
+    map.once('singleclick', selectRiver);
+  }
 }); 

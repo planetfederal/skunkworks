@@ -7,6 +7,9 @@ html, body {
   width: 100%;
   height: 100%;
 }
+.map.crosshair {
+  cursor: crosshair;
+}
 .panel {
   position: absolute;
   background-color: white;
@@ -24,6 +27,6 @@ html, body {
   padding: 10px 15px;
   user-select: none;
 }
-.go-btn:hover {
+.go-btn:hover, .go-btn.toggled {
   background-color: #42A1E0;
 }
