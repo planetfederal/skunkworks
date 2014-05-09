@@ -56,7 +56,9 @@ function getDownstreamFeaturesLayer(gid) {
       style: downstreamStyles,
       visible: true
     });
-    map.addLayer(vectorLayer);
+    var collection = map.getLayers();
+    collection.insertAt(2, vectorLayer);
+    //map.addLayer(vectorLayer);
 
     //getAffectedFeaturesLayer(res);
   })
