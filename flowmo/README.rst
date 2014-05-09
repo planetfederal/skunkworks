@@ -26,6 +26,11 @@ Victor Lessons
 Michael Lessons
 ---------------
 
+- Small AWS instances are far too resource constrained for even the most simple production use
+- GeoServer needs a GeoScript WPS workflow
+- One can get a .servebeer.com domain for free!
+
+
 
 Kevin Lessons
 -------------
