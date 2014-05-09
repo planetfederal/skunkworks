@@ -51,25 +51,25 @@ Gabriel Lessons
 Data
 ====
 
-- BC WSA data from http://data.gov.bc.ca
-- Info page: http://www.data.gov.bc.ca/dbc/catalogue/detail.page?config=dbc&P110=recorduid:173912&recorduid=173912&title=WSA%20-%20STREAM%20CENTRELINE%20NETWORK%20(50,000)
+- `BC WSA data <http://www.data.gov.bc.ca/dbc/catalogue/detail.page?config=dbc&P110=recorduid:173912&recorduid=173912&title=WSA%20-%20STREAM%20CENTRELINE%20NETWORK%20(50,000)>`_ from `data.gov.bc.ca <http://data.gov.bc.ca>`_
 
 ::
 
+  # Load the data with shp2pgsql
   shp2pgsql -W LATIN1 -s 3005 -D -I -i -S WSA_SL_SVW_line.shp wsa_rivers | psql rivers
 
+  # Strip out the Z/M information
   ALTER TABLE wsa_rivers ALTER COLUMN geom TYPE Geometry(Linestring, 3005) USING ST_Force2D(geom);
+  # Spatially cluster the data using the index
   CLUSTER wsa_rivers USING wsa_rivers_geom_gist;
 
 
-- BC Points of Diversion with Water Licence Information from http://data.gov.bc.ca
-- Info page: http://www.data.gov.bc.ca/dbc/catalogue/detail.page?config=dbc&P110=recorduid:173495&recorduid=173495&title=BC%20Points%20of%20Diversion%20with%20Water%20Licence%20Information
+- `BC Points of Diversion with Water Licence Information <http://www.data.gov.bc.ca/dbc/catalogue/detail.page?config=dbc&P110=recorduid:173495&recorduid=173495&title=BC%20Points%20of%20Diversion%20with%20Water%20Licence%20Information>`_ from `data.gov.bc.ca <http://data.gov.bc.ca>`_
 
 ::
 
-  ogr2ogr --config PG_USE_COPY YES -f PGDump points_of_diversion.sql WLS_PDL_SP_point.shp
+  shp2pgsql -W LATIN1 -s 3005 -D -I -i WLS_PDL_SP_point.shp wls_pdl_sp_point | psql rivers
   
-  psql < points_of_diversion.sql
 
 
 GeoServer Layers
