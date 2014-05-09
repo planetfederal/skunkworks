@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
     <link rel="stylesheet" href="resources/ol3//ol.css" type="text/css">
-    <link rel="stylesheet" href="resources/bootstrap/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="http://getbootstrap.com/dist/css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="resources/bootstrap/css/bootstrap-responsive.min.css" type="text/css">
     <link rel="stylesheet" href="resources/slider/css/bootstrap-slider.min.css" type="text/css">
     <title>Sports Nut - World Cup edition</title>
@@ -24,7 +24,7 @@
       #map {
         width: 400px;
         top: 5px;
-        left: 400px;
+        left: 500px;
         position: absolute;
       }
     </style>
@@ -52,13 +52,17 @@
 <button id="forward" type="button" class="btn btn-default">
   <span class="glyphicon glyphicon-forward"></span> Forward
 </button>
+
+
+    
 </div>
           <div id="map" class="map"></div>
         </div>
       </div>
 
       </div>
-
+      <input id="hotels" type="text" autocomplete="off">
+      <div id="hotel-results"></div>
     </div>
 
     <script src="resources/jquery.min.js" type="text/javascript"></script>

@@ -1,5 +1,7 @@
 # Minesweeper goes Geo
 
+This game app was developed by @sbalasub, @jmarin, @dwins, @bosth and @ahocevar during the Boundles Spring Kickoff in May 2014 in New Orleans.
+
 ## 1. Data download and preparation
 
 
@@ -62,6 +64,14 @@ GROUP BY a.fid
    The view will return the ``fid`` and geometry of each feature that has a land border with another feature (``ST_Intersects``). Additionally, we will receive the count of countries that are bordered and a comma-separated list of ``fid``s of the bordering features. Finally, the ``mined`` attribute will contain a boolean indicating whether there is a mine or not.
 
    There are two parameters in the view: ``table``, which allows us to use any table in the database for our game map; and ``field`` which is a number between 0 and 1 which indicates what percentage of features will btable``, which allows us to use any table in the database for our game map; and ``field`` which is a number between 0 and 1 which indicates what percentage of features will be mined. By default, we configured ``table`` to default to ``countries`` and ``field`` to ``0.2``.
+
+- Publish a new layer named ``sweep``. It will be the following SQL view:
+
+```
+select fid, geom from %table%
+```
+
+  Again the ``table`` parameter will be used and will default to ``countries``.
 
 ## 4. Client app configuration and building
 

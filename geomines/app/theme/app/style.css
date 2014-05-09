@@ -4,4 +4,7 @@ html, body, #map {
 }
 #map {
   background-color: #001111;
+  background-image: url(ajax-loader.gif);
+  background-repeat: no-repeat;
+  background-position: center center;
 }
