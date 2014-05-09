@@ -2,7 +2,11 @@ var currentDate;
 var matchDates = [];
 var rewriteIcon = function(icon) {
   icon = icon.substring(icon.lastIndexOf('/')+1).replace('.svg', '.png');
-  return 'http://ec2-54-81-74-227.compute-1.amazonaws.com:8080/geoserver/styles/sportsnut/' + icon;
+  // preload
+  var img = new Image();
+  var rewrite = 'http://ec2-54-81-74-227.compute-1.amazonaws.com:8080/geoserver/styles/sportsnut/' + icon;
+  img.src = rewrite;
+  return rewrite;
 }
 var loadFeatures = function(response) {
   // TODO this does not work with ol.js
