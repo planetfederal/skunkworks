@@ -95,6 +95,7 @@
     })
   });
 
+  // turn on the single layer that is clicked on
   $('#radios').click(function(e) {
     var target = e.target;
     var layerName = target.getAttribute('data-radio');
@@ -107,5 +108,8 @@
     });
     layer.setVisible(true);
   });
+
+  // the first layer should be visible on page load
+  iceLayers[0].setVisible(true);
 
 }());
