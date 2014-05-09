@@ -23,6 +23,14 @@ http://www.data.gov.bc.ca/dbc/catalogue/detail.page?config=dbc&P110=recorduid:17
   CLUSTER wsa_rivers USING wsa_rivers_geom_gist;
 
 
+BC Points of Diversion with Water Licence Information from
+http://data.gov.bc.ca
+
+http://www.data.gov.bc.ca/dbc/catalogue/detail.page?config=dbc&P110=recorduid:173495&recorduid=173495&title=BC%20Points%20of%20Diversion%20with%20Water%20Licence%20Information
+
+  ogr2ogr --config PG_USE_COPY YES -f PGDump points_of_diversion.sql WLS_PDL_SP_point.shp
+  
+  psql < points_of_diversion.sql
 
 CTE SQL Queries
 ===============
