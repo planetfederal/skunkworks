@@ -1,4 +1,4 @@
-TEAM
+Team
 ====
 
 - Michael W.
@@ -8,7 +8,7 @@ TEAM
 - Gabriel R.
 
 
-PAUL LESSONS
+Paul Lessons
 ------------
 
 - CTE SQL is not fast enough to dynamically walk large networks
@@ -18,26 +18,26 @@ PAUL LESSONS
 - GeoServer labelling engine is really good
 
 
-VICTOR LESSONS
+Victor Lessons
 --------------
 
 
 
-MICHAEL LESSONS
+Michael Lessons
 ---------------
 
 
-KEVIN LESSONS
+Kevin Lessons
 -------------
 
 
 
-GABRIEL LESSONS
+Gabriel Lessons
 ---------------
 
 
 
-DATA
+Data
 ====
 
 - BC WSA data from http://data.gov.bc.ca
@@ -61,7 +61,7 @@ DATA
   psql < points_of_diversion.sql
 
 
-GEOSERVER LAYERS
+GeoServer Layers
 ================
 
 - Add a layer named `wsa_rivers` referencing the wsa_rivers table
@@ -74,7 +74,7 @@ GEOSERVER LAYERS
 CTE SQL Queries
 ===============
 
-WSA_DOWNSTREAM
+wsa_downstream
 --------------
 
 ::
@@ -91,7 +91,7 @@ WSA_DOWNSTREAM
    SELECT gid, geom FROM downstream
 
 
-WSA_AFFECTED
+wsa_affected
 ------------
 
 ::
@@ -110,7 +110,7 @@ WSA_AFFECTED
   WHERE lic_status = 'CURRENT'
 
 
-WSA_DOWNSTREAM_VECTOR
+wsa_downstream_vector
 ---------------------
 
 ::
@@ -127,7 +127,7 @@ WSA_DOWNSTREAM_VECTOR
   SELECT ST_LineMerge(ST_Collect(geom)) FROM downstream;
 
 
-WSA_AFFECTED_VECTOR
+wsa_affacted_vector
 -------------------
 
 ::
@@ -139,7 +139,7 @@ WSA_AFFECTED_VECTOR
   AND lic_status = 'CURRENT';
 
 
-INTERFACE
+Interface
 =========
 
 To run dev server:
