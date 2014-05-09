@@ -62,3 +62,7 @@ Test the unique functions of the OpenGeo Suite that differentiates it from other
   * Visualization in QGIS.
 * The Suite QGIS plugin allows the end user/analyst to access/modify/visualize changes without having to go through a CLI or GeoServer interface.
 * Data Management (discovering, downloading, processing, uploading the data) consumes the majority of time required to produce a map application.
+
+# Artifacts:
+Most of the data and styles are checked directly into the repo. The base map is natural earth reprojected to 3408, and can be found at:
+https://docs.google.com/a/boundlessgeo.com/file/d/0ByoviHmnhuhWNkwtUy1KY1IzMVU
