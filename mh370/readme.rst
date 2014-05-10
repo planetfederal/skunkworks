@@ -61,7 +61,7 @@ Once we had the data, we needed to process it. There were two main tasks we need
 Task 1: Draw circles.
 ----------------------
 
-We had data for the last known points of contact, and also the satellite location.
+We had data for the last known points of contact, and also the satellite location. We had the radius from the satellite in which the plane could potentially be located.
 
 For the former, we used PostGIS to create a new data layer with a circle around the last known points of contact detailing the maximum range of flight for the aircraft. This involved converting the point geometry to a geography, and then running a buffer process on the geographic feature. To make GeoServer render the data, we converted the geography features back to geometries.
 
@@ -106,7 +106,7 @@ Glitches:
 * Adding circles layer twice to a layer group with different style? Does not work!
 * Using CSS #circle.1 {fill,stroke} #circle.2 {fill} did not work -> resulting style rendered both circles with a stroke!
 * communication issues around what data is available :)
-* brought in gradiculte rather than world bounding box, ended up styling the grid for a pixel effect
+* brought in gradicule rather than world bounding box, ended up styling the grid for a pixel effect
 * raster gamma correction did not appear to do anything, ended up blocking out the land mass to make the map appear "night"
 
 The code we needed to write
