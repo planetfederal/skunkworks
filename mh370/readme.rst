@@ -134,14 +134,13 @@ The OpenGeo Suite plugin does not upload the SVG files used by a style when uplo
 https://github.com/boundlessgeo/suite-qgis-plugin/issues/140
 
 
-Process
-********
+**Process**
 
-1. Environment
+**1. Environment**
 
 - For a Windows-based GISP, connecting to an Amazon Ubuntu instance running GeoServer using keys, Putty, WinSCP + setting up pgAdminIII to get data in the correct place and restart PostGIS and GeoServer when it seems to be hanging (occurred a few times) can be very confusing.
 
-2. Data Wrangling
+**2. Data Wrangling**
 
 - For someone not familiar with good GIS data sets, it's not clear how to get good basic data quickly so Data Packs and pointers would be very useful.
 
@@ -150,14 +149,14 @@ Process
 - For a GISP to get data on to a remote server using ssh + wget + unzip + psql import on the server was most straightforward but it'd be nice if they could do that through a Data Pack UI or pgAdminIII or pgShapeloader.
 
 
-3. Documentation
+**3. Documentation**
 
 - Searching online for straightforward documentation is not easy and can take long.  What's the best place to get scripts to import datasets like GeoNames to PostGIS?  GIS StackExchange?
 
 - We found the structure of our documentation confusing. When installing the CSS extension for GeoServer we followed the wrong documentation for it, mixing Community doc and our own Suite Docs and installing the wrong module. https://github.com/boundlessgeo/suite/issues/331   We've asked resourcing to discuss and resolve this using a new visually distinct theme for Community vs. Suite and creating a Suite Docs version landing page on boundlessgeo.com.
 
 
-4. Suite Stack
+**4. Suite Stack**
 
 - What happened to the default layer switcher in OL3?  :(
 
