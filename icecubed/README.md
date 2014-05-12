@@ -62,7 +62,8 @@ Test the unique functions of the OpenGeo Suite that differentiates it from other
   * Visualization in QGIS.
 * The Suite QGIS plugin allows the end user/analyst to access/modify/visualize changes without having to go through a CLI or GeoServer interface. Great potential to "grow the pie" of potential users by allowing analysts to publish maps directly.
 * Data Management (discovering, downloading, processing, uploading the data) consumes the majority of time required to produce a map application.
-* GeoWebCache workflow in the GeoServer UI is unclear. Process / workflow for creating gridset, accessing layer, applying gridset, determining cache extents could be simplified. 
+* GeoWebCache workflow in the GeoServer UI is unclear. Process / workflow for creating gridset, accessing layer, applying gridset, determining cache extents could be simplified.
+* Initially we had tried to use ogr2ogr to import the shapefiles into postgis. The detected projection didn't match however, and it looked like ogr2ogr created a new projection without a known srid. We went down a different path in geoserver then to try and get this new projection recognized. This ended up generating exceptions in geoserver when trying to serve getmap requests though. We then scrapped this approach and used the data importer from geoserver. We manually specified the projection at import time, and this ended up working for us. shp2pgsql probably would have worked for us as well, but the geoserver importer was nice because it allowed us to import all the shapefiles at once.
 
 # Artifacts:
 Most of the data and styles are checked directly into the repo. The base map is natural earth reprojected to 3408, and can be found at:
