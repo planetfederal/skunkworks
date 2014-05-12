@@ -26,8 +26,12 @@ Paul Lessons
 
 Victor Lessons
 --------------
-
-
+- SQL Views & CTE queries for fun and profit
+- SQL View changes require saving both on that page and the layer page
+- SLD error output not very helpful when min/max were out of order
+- GWC can be a bit finicky to set up
+- OL3 "Layers are cheap" -- can't set new source on vector layer, encouraged to just create new layer
+- OL3's new searchable docs make for a much nicer experience
 
 Michael Lessons
 ---------------
