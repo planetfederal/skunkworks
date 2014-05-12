@@ -18,6 +18,7 @@ var rewriteIcon = function(icon) {
 
 var loadFeatures = function(response) {
   // TODO this does not work with ol.js
+  // see: https://github.com/openlayers/ol3/pull/2057
   var features = vector.getSource().readFeatures(response);
   for (var i=0, ii=features.length; i<ii; ++i) {
     var feature = features[i];
