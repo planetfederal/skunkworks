@@ -128,9 +128,12 @@ package repository. As root:
 
 ### Front End
 
+ol3 map with JSONP to get matchview data. Style function to filter on the time field.
+So all data is retrieved on first load, and then filtered for display.
+The style function also displays the flag of the home and away country, by using a different anchor
+Used the following Bootstrap slider for the playback toolbar: https://github.com/seiyria/bootstrap-slider
+When a feature is clicked in the map, the hotel search field will be automatically filled in and the hotel search will be triggered.
 
-
-
-
-
-
+Bugs encountered:
+[WMTS capabilities invalid] https://github.com/boundlessgeo/suite/issues/333
+[WMTS date wrapping issue] https://github.com/boundlessgeo/suite/issues/334 (not sure if this is ol3 or GWC)
