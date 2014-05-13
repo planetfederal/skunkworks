@@ -139,8 +139,22 @@ wsa_affected
     AND ST_Equals(ST_StartPoint(ST_GeometryN(d.geom,1)),ST_EndPoint(ST_GeometryN(r.geom,1)))
     AND NOT d.gidlist @> ARRAY[r.gid]
   )
-  SELECT ogc_fid, wkb_geometry, licence_no, purpose, strm_name, licensee, ddrssln1, ddrssln2
+  SELECT DISTINCT ON (tpod_tag) ogc_fid, wkb_geometry, licence_no, purpose, strm_name, licensee, ddrssln1, ddrssln2
   FROM wls_pdl_sp_point JOIN downstream ON ST_DWithin(downstream.geom, wls_pdl_sp_point.wkb_geometry, %radius%)
+  WHERE lic_status = 'CURRENT'
+
+
+  WITH RECURSIVE downstream(gidlist, gid, geom, trmmdwtrsh) AS (
+    SELECT ARRAY[gid] as gidlist, gid, geom, trmmdwtrsh FROM wsa_rivers WHERE gid = 885367
+  UNION ALL
+    SELECT array_append(d.gidlist, r.gid) AS gidlist, r.gid, r.geom, r.trmmdwtrsh
+    FROM downstream d, wsa_rivers r
+    WHERE d.geom && r.geom
+    AND ST_Equals(ST_StartPoint(ST_GeometryN(d.geom,1)),ST_EndPoint(ST_GeometryN(r.geom,1)))
+    AND NOT d.gidlist @> ARRAY[r.gid]
+  )
+  SELECT DISTINCT ON (tpod_tag) ogc_fid, wkb_geometry, licence_no, purpose, strm_name, licensee, ddrssln1, ddrssln2
+  FROM wls_pdl_sp_point JOIN downstream ON ST_DWithin(downstream.geom, wls_pdl_sp_point.wkb_geometry, 500)
   WHERE lic_status = 'CURRENT'
 
 
