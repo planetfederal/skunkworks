@@ -1,7 +1,7 @@
 (function() {
 
   // TODO need to explicitly set map height?
-  document.getElementById('map').style.height = '500px';
+  // document.getElementById('map1123  //   //   // ').style.height = '500px';
 
   var extent3408 = [
     -4938036.174191093,
@@ -82,7 +82,24 @@
     iceLayers.push(layer);
   });
   var medianLayer = makeExtentLayer('median_N_08_1981_2010_polyline', true);
-  var allLayers = [baseLayer].concat(iceLayers).concat(medianLayer);
+  var cryoLayer = new ol.layer.Tile({
+    source: new ol.source.TileWMS({
+      url: 'https://nsidc.org/cgi-bin/atlas_north',
+      params: {
+        LAYERS: 'snow_extent_08',
+        TILED: true,
+        SRS: 'EPSG:3408'
+      },
+      projection: projection3408
+    }),
+    visible: true
+  });
+
+
+  var allLayers = [baseLayer]
+    .concat(iceLayers)
+    .concat(medianLayer)
+    .concat(cryoLayer);
 
   var map = new ol.Map({
     target: 'map',
@@ -110,6 +127,10 @@
       iceLayer.setVisible(false);
     });
     layer.setVisible(true);
+  });
+
+  $('#cryo').click(function(e) {
+    cryoLayer.setVisible(this.checked);
   });
 
   // the first layer should be visible on page load

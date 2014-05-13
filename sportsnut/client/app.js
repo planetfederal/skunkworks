@@ -9,8 +9,16 @@ var rewriteIcon = function(icon) {
   img.src = rewrite;
   return rewrite;
 }
+      var popup = new Boundless.Popup({
+        element: document.getElementById('popup'),
+        closeBox: true,
+        offsetY: -125,
+        autoPan: true
+      });
+
 var loadFeatures = function(response) {
   // TODO this does not work with ol.js
+  // see: https://github.com/openlayers/ol3/pull/2057
   var features = vector.getSource().readFeatures(response);
   for (var i=0, ii=features.length; i<ii; ++i) {
     var feature = features[i];
@@ -127,10 +135,11 @@ var layers = [
 ];
 var map = new ol.Map({
   layers: layers,
-  target: 'map',
+  overlays: [popup],
+  target: document.getElementById('map'),
   view: new ol.View2D({
     center: [-7067287.25262743, -2705645.022595205],
-    zoom: 3
+    zoom: 4
   })
 });
 vector.getSource().on('change', function(evt) {
@@ -177,3 +186,32 @@ $('#backward').on('click', function (e) {
     vector.getSource().dispatchChangeEvent();
   }
 });
+
+      $(map.getViewport()).on('mousemove', function(evt) {
+        var pixel = map.getEventPixel(evt.originalEvent);
+        var feature = map.forEachFeatureAtPixel(pixel, function(feature, layer) {
+          return feature;
+        });
+        if (feature) {
+          popup.setPosition(feature.getGeometry().getCoordinates());
+          var html = "<table class='table table-bordered'>";
+          html += '<tr><td>' + feature.get('team1') + ' vs ' + feature.get('team2') + '</td></tr>';
+          html += '<tr><td>' + feature.get('stadium') + '</td></tr>';
+          html += '<tr><td>' + feature.get('identifier') + '</td></tr>';
+          html += '</table>';
+          popup.setContent(html);
+          popup.show();
+        } else {
+          popup.hide();
+        }
+      });
+
+      map.on('singleclick', function(evt) {
+        var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+          return feature;
+        });
+        if (feature) {
+          $("#hotels").val(feature.get('stadium'));
+          queryCity(feature.get('stadium'));
+        }
+      });

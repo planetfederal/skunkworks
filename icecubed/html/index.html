@@ -29,7 +29,7 @@
 <div class="main-container">
     <div class="header wrapper">
         <header class="container">
-            <h1 class="title">Ice³</h1>
+            <h1 class="title" id="title">Ice³</h1>
             <img src="img/iceberg-large.png" alt="iceberg">
         </header>
     </div>
@@ -38,6 +38,10 @@
         <div class="container">
           <div id="map"></div>
           <div id="legend"><img src="img/legend.png"></div>
+          <label for="cryo" class="snowfall">
+              <input id="cryo" type="checkbox" value="cryo" checked="checked">
+              Average Snow Extent
+            </label>
         </div> <!-- #main -->
     </div> <!-- #main-container -->
 
@@ -85,6 +89,7 @@
     </div>
 </div>
 
+
 <!-- jQuery -->
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.0.min.js"><\/script>')</script>
@@ -95,7 +100,7 @@
     $(document).ready( function(){
         $("#radios").radiosToSlider();
     });
-</script>
+</script> 
 
 <!-- Misc -->
 <script src="js/main.js"></script>
