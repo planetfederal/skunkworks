@@ -60,136 +60,166 @@ Gabriel Lessons
 Data
 ====
 
-- `BC WSA data <http://www.data.gov.bc.ca/dbc/catalogue/detail.page?config=dbc&P110=recorduid:173912&recorduid=173912&title=WSA%20-%20STREAM%20CENTRELINE%20NETWORK%20(50,000)>`_ from `data.gov.bc.ca <http://data.gov.bc.ca>`_
+- Create a database and PostGIS enable it
 
 ::
+
+  createdb flowmo
+  psql -d flowmo -c 'create extension postgis'
+
+- Retrieve and load the `BC 1:50K Watershed Atlas <http://data.opengeo.org/flowmo/BC-WSA.zip>`_ data.
+
+:: 
 
   # Load the data with shp2pgsql
-  shp2pgsql -W LATIN1 -s 3005 -D -I -i -S WSA_SL_SVW_line.shp wsa_rivers | psql rivers
+  # stream lines
+  shp2pgsql -W LATIN1 -s 3005 -D -I -i -S lwssbcgzl.shp lwss | psql flowmo
+  # water polygons
+  shp2pgsql -W LATIN1 -s 3005 -D -I -i -S lwslbcgz.shp lwsl | psql flowmo
 
-  # Strip out the Z/M information
-  ALTER TABLE wsa_rivers ALTER COLUMN geom TYPE Geometry(Linestring, 3005) USING ST_Force2D(geom);
-  # Spatially cluster the data using the index
-  CLUSTER wsa_rivers USING wsa_rivers_geom_gist;
-
-
-- `BC Points of Diversion with Water Licence Information <http://www.data.gov.bc.ca/dbc/catalogue/detail.page?config=dbc&P110=recorduid:173495&recorduid=173495&title=BC%20Points%20of%20Diversion%20with%20Water%20Licence%20Information>`_ from `data.gov.bc.ca <http://data.gov.bc.ca>`_
+- retrieve and load the `BC Points of Diversion with Water Licence Information <http://www.data.gov.bc.ca/dbc/catalogue/detail.page?config=dbc&P110=recorduid:173495&recorduid=173495&title=BC%20Points%20of%20Diversion%20with%20Water%20Licence%20Information>`_ from `data.gov.bc.ca <http://data.gov.bc.ca>`_
 
 ::
 
-  shp2pgsql -W LATIN1 -s 3005 -D -I -i WLS_PDL_SP_point.shp wls_pdl_sp_point | psql rivers
+  shp2pgsql -W LATIN1 -s 3005 -D -I -i WLS_PDL_SP_point.shp points_of_diversion | psql flowmo
   
 
 
 GeoServer Layers
 ================
 
-- Add a layer named ``wsa_rivers`` referencing the wsa_rivers table
-- Use the ``wsa_layers.sld`` to style the layer
-- Add a layer named ``wsa_downstream`` and make it a SQL view layer
+- Add a layer named ``lwss`` referencing the lwss table
+- Use the ``lwss.sld`` to style the layer
+- Add a layer named ``lwss_downstream`` and make it a SQL view layer
 
-  - Use the wsa_downstream CTE SQL to fill in the layer definition
-  - Use the ``wsa_downstream.sld`` to style the layer
+  - Use the lwss_downstream SQL to fill in the layer definition
+  - Use the ``lwss_downstream.sld`` to style the layer
   
-- Add a layer named ``wsa_downstream_vector`` and make it a SQL view layer
+- Add a layer named ``lwss_downstream_vector`` and make it a SQL view layer
 
-  - Use the wsa_downstream_vector CTE SQL to fill in the layer definition
-  - Use the ``wsa_downstream.sld`` to style the layer
+  - Use the lwss_downstream_vector SQL to fill in the layer definition
+  - Use the ``lwss_downstream.sld`` to style the layer
   
-- Add a layer named ``wsa_affected`` and make it a SQL view layer
+- Add a layer named ``points_of_diversion_affected`` and make it a SQL view layer
 
-  - Use the wsa_affected CTE SQL to fill in the layer definition
-  - Use the ``wsa_affected.sld`` to style the layer
-  
-- Add a layer named ``wsa_affected_vector`` and make it a SQL view layer
-
-  - Use the wsa_affected_vector CTE SQL to fill in the layer definition
-  - Use the ``wsa_affected.sld`` to style the layer
+  - Use the points_of_diversion_affected SQL to fill in the layer definition
+  - Use the ``points_of_diversion_affected.sld`` to style the layer
 
 
-CTE SQL Queries
-===============
+SQL Setup
+=========
 
-wsa_downstream
---------------
+The SQL views used for visualization require some support functions and tables to operate. Here is the SQL to run to set them up.
+
+The downstream query is executed using the "`watershed code <http://www.env.gov.bc.ca/fish/pdf/guide2_hierarchical_watershed_coding_system4BC.pdf>`_" on the stream segments, which encode the "stream heirarchy" into a 45-digit numerical code.
+
+Here's an example watershed code, expanded into parts: major basin, then subwatersheds, working from the ocean (left) to the mountains (right)::
+
+  120 246600 11500 09000 4320 1370 000 000 000 000 000 000
+
+So, 120 = Fraser, and 24.6% up the Fraser, the Nicola entered, and 11.5% up the Nicola the next river entered, and so on.
 
 ::
 
-  # default value gid = 885367
-   WITH RECURSIVE downstream(gidlist, gid, geom, trmmdwtrsh) AS (
-     SELECT ARRAY[gid] as gidlist, gid, geom, trmmdwtrsh FROM wsa_rivers WHERE gid = %gid%
-   UNION ALL
-     SELECT array_append(d.gidlist, r.gid) AS gidlist, r.gid, r.geom, r.trmmdwtrsh
-     FROM downstream d, wsa_rivers r
-     WHERE d.geom && r.geom
-     AND ST_Equals(ST_StartPoint(ST_GeometryN(d.geom,1)),ST_EndPoint(ST_GeometryN(r.geom,1)))
-     AND NOT d.gidlist @> ARRAY[r.gid]
-   )
-   SELECT gid, geom FROM downstream
+  -- We need a table structure to define the output of our query building
+  -- function
+  DROP IF EXISTS TABLE wsquery;
+  CREATE TABLE wsquery (ws_code varchar(45), seg_prop varchar(6));
+
+  -- Query building function takes a watershed code and proportion up it, and 
+  -- generates a set of codes and proportions that can be used to find all the 
+  -- downstream segments.
+  CREATE OR REPLACE FUNCTION get_wsquery(varchar,varchar) RETURNS SETOF wsquery AS
+  $BODY$
+  DECLARE
+      ws_code varchar := $1;
+      seg_prop varchar := $2;
+      ws_sizes integer[] := ARRAY[6,5,5,4,4,3,3,3,3,3,3];
+      result wsquery;
+      ws_len integer;
+      ws_size integer := 3;
+      ws_pos integer := 4;
+  BEGIN
+
+      result.seg_prop := seg_prop;
+      result.ws_code := ws_code;
+      RETURN NEXT result;
+
+      FOREACH ws_len IN ARRAY ws_sizes
+      LOOP
+          result.seg_prop := substring(ws_code from ws_pos for ws_len);
+          result.ws_code := substring(ws_code from 1 for ws_size) || repeat('0', 45 - ws_size);
+          IF int4(result.seg_prop) = 0 THEN
+              RETURN;
+          END IF;
+          ws_size := ws_size + ws_len;
+          ws_pos := ws_size + 1;
+          RETURN NEXT result;
+      END LOOP;
+      RETURN;
+  END
+  $BODY$
+  LANGUAGE plpgsql;
+
+  -- How to use the query, just join it to the master table
+  -- and find all the lines with the same watershed codes and proportions less than the 
+  -- thresholds.
+  SELECT s.geom, s.gaze_name, s.ws_code, s.seg_prop 
+  FROM lwss s 
+  JOIN get_wsquery('120246600115000900000000000000000000000000000','0140') q
+  ON s.ws_code = q.ws_code and s.seg_prop < q.seg_prop
+  ORDER BY ws_code DESC, seg_prop DESC;
 
 
-wsa_affected
-------------
+SQL View Queries
+================
+
+Use these in defining the SQL views that will drive the dynamic part of the application. They take in a parameter, and output a result set that can be used to draw the downstream effects.
+
+lwss_downstream
+---------------
 
 ::
 
-  # default value gid = 885367, radius = 500
-  WITH RECURSIVE downstream(gidlist, gid, geom, trmmdwtrsh) AS (
-    SELECT ARRAY[gid] as gidlist, gid, geom, trmmdwtrsh FROM wsa_rivers WHERE gid = %gid%
-  UNION ALL
-    SELECT array_append(d.gidlist, r.gid) AS gidlist, r.gid, r.geom, r.trmmdwtrsh
-    FROM downstream d, wsa_rivers r
-    WHERE d.geom && r.geom
-    AND ST_Equals(ST_StartPoint(ST_GeometryN(d.geom,1)),ST_EndPoint(ST_GeometryN(r.geom,1)))
-    AND NOT d.gidlist @> ARRAY[r.gid]
+  # default values ws_code = 120246600115000900000000000000000000000000000, seg_prop = 0140
+  SELECT s.geom, s.gaze_name, s.ws_code, s.seg_prop 
+  FROM lwss s 
+  JOIN get_wsquery('%ws_code%','%seg_prop%') q
+  ON s.ws_code = q.ws_code and s.seg_prop < q.seg_prop;
+
+
+points_of_diversion_affected
+----------------------------
+
+::
+
+  # default values ws_code = 120246600115000900000000000000000000000000000, seg_prop = 0140
+  # radius = 500
+  WITH downstream AS (
+    SELECT s.geom, s.gaze_name, s.ws_code, s.seg_prop 
+    FROM lwss s 
+    JOIN get_wsquery('%ws_code%','%seg_prop%') q
+    ON s.ws_code = q.ws_code and s.seg_prop < q.seg_prop
   )
-  SELECT DISTINCT ON (tpod_tag) ogc_fid, wkb_geometry, licence_no, purpose, strm_name, licensee, ddrssln1, ddrssln2
-  FROM wls_pdl_sp_point JOIN downstream ON ST_DWithin(downstream.geom, wls_pdl_sp_point.wkb_geometry, %radius%)
+  SELECT DISTINCT ON (tpod_tag) 
+    ogc_fid, wkb_geometry, licence_no, purpose, 
+    strm_name, licensee, ddrssln1, ddrssln2
+  FROM points_of_diversion 
+  JOIN downstream 
+  ON ST_DWithin(downstream.geom, points_of_diversion.geom, %radius%)
   WHERE lic_status = 'CURRENT'
 
 
-  WITH RECURSIVE downstream(gidlist, gid, geom, trmmdwtrsh) AS (
-    SELECT ARRAY[gid] as gidlist, gid, geom, trmmdwtrsh FROM wsa_rivers WHERE gid = 885367
-  UNION ALL
-    SELECT array_append(d.gidlist, r.gid) AS gidlist, r.gid, r.geom, r.trmmdwtrsh
-    FROM downstream d, wsa_rivers r
-    WHERE d.geom && r.geom
-    AND ST_Equals(ST_StartPoint(ST_GeometryN(d.geom,1)),ST_EndPoint(ST_GeometryN(r.geom,1)))
-    AND NOT d.gidlist @> ARRAY[r.gid]
-  )
-  SELECT DISTINCT ON (tpod_tag) ogc_fid, wkb_geometry, licence_no, purpose, strm_name, licensee, ddrssln1, ddrssln2
-  FROM wls_pdl_sp_point JOIN downstream ON ST_DWithin(downstream.geom, wls_pdl_sp_point.wkb_geometry, 500)
-  WHERE lic_status = 'CURRENT'
-
-
-wsa_downstream_vector
----------------------
+lwss_downstream_vector
+----------------------
 
 ::
 
-  # default value gid = 885367
-  WITH RECURSIVE downstream(gidlist, gid, geom, trmmdwtrsh) AS (
-    SELECT ARRAY[gid] as gidlist, gid, geom, trmmdwtrsh FROM wsa_rivers WHERE gid = %gid%
-  UNION ALL
-    SELECT array_append(d.gidlist, r.gid) AS gidlist, r.gid, r.geom, r.trmmdwtrsh
-    FROM downstream d, wsa_rivers r
-    WHERE d.geom && r.geom
-    AND ST_Equals(ST_StartPoint(ST_GeometryN(d.geom,1)),ST_EndPoint(ST_GeometryN(r.geom,1)))
-    AND NOT d.gidlist @> ARRAY[r.gid]
-  )
-  SELECT ST_LineMerge(ST_Collect(geom)) FROM downstream;
-
-
-wsa_affacted_vector
--------------------
-
-::
-
-  # default value {"type":"LineString","coordinates":[[-13754654.8188296,6216692.99816636],[-13754801.9782898,6216654.00547668]]}
-  SELECT ogc_fid, wkb_geometry, licence_no, purpose, strm_name, licensee, ddrssln1, ddrssln2
-  FROM wls_pdl_sp_point 
-  WHERE ST_DWithin(wkb_geometry, ST_Transform(ST_SetSRID(ST_GeomFromGeoJSON('%json%'),3857),3005), 500)
-  AND lic_status = 'CURRENT'
+  # default values ws_code = 120246600115000900000000000000000000000000000, seg_prop = 0140
+  SELECT ST_Collect(s.geom) AS geom
+  FROM lwss s 
+  JOIN get_wsquery('%ws_code%','%seg_prop%') q
+  ON s.ws_code = q.ws_code and s.seg_prop < q.seg_prop;
 
 
 
