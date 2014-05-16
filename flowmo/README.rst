@@ -93,82 +93,92 @@ GeoServer Layers
 - Add a layer named ``lwss_downstream`` and make it a SQL view layer
 
   - Use the lwss_downstream SQL to fill in the layer definition
-  - Use the ``lwss_downstream.sld`` to style the layer
-  
-- Add a layer named ``lwss_downstream_vector`` and make it a SQL view layer
-
-  - Use the lwss_downstream_vector SQL to fill in the layer definition
-  - Use the ``lwss_downstream.sld`` to style the layer
+  - Create a style named ``lwss_downstream``
+  - Use the ``lwss_downstream.sld`` file for the style and add it to the layer
   
 - Add a layer named ``points_of_diversion_affected`` and make it a SQL view layer
 
   - Use the points_of_diversion_affected SQL to fill in the layer definition
-  - Use the ``points_of_diversion_affected.sld`` to style the layer
+  - Create a style named ``points_of_diversion_affected``
+  - Use the ``points_of_diversion_affected.sld`` file for the style and add it to the layer
 
 
 SQL Setup
 =========
 
-The SQL views used for visualization require some support functions and tables to operate. Here is the SQL to run to set them up.
+The SQL views used for visualization require a support table to operate. 
 
-The downstream query is executed using the "`watershed code <http://www.env.gov.bc.ca/fish/pdf/guide2_hierarchical_watershed_coding_system4BC.pdf>`_" on the stream segments, which encode the "stream heirarchy" into a 45-digit numerical code.
+The data in the table codes every "river" with a unique "wsg_id / ws_key" combination. To make downstream queries faster, we will calculation the from/to relationships between each river. So, "river A flows down to river B which flows down to river C", etc.
 
-Here's an example watershed code, expanded into parts: major basin, then subwatersheds, working from the ocean (left) to the mountains (right)::
+The from/to table calculation is a little complex::
 
-  120 246600 11500 09000 4320 1370 000 000 000 000 000 000
+  -- Index the keys we're going to be searching on a lot
+  CREATE INDEX lwss_idx ON lwss (wsg_id, ws_key, seg_no);
 
-So, 120 = Fraser, and 24.6% up the Fraser, the Nicola entered, and 11.5% up the Nicola the next river entered, and so on.
+  -- Create the from/to table
+  CREATE TABLE lwss_from_to AS
+  WITH endpoints_many AS (
+    SELECT ws_key, Min(seg_no) AS seg_no, wsg_id
+    FROM lwss
+    WHERE seg_no > 0 AND ws_key = bl_key
+    GROUP BY wsg_id, ws_key
+    ORDER BY ws_key
+  ),
+  endpoints AS (
+    SELECT l.ws_key, l.seg_no, l.wsg_id, Max(l.l_magnitud) AS l_magnitud
+    FROM lwss l 
+    JOIN endpoints_many e USING (wsg_id, ws_key, seg_no)
+    GROUP BY l.ws_key, l.seg_no, l.wsg_id
+    ORDER BY ws_key
+  ),
+  downstream_ws_keys AS (
+    SELECT 
+      b.geom, e.wsg_id AS from_wsg_id, e.ws_key AS from_ws_key, 
+      e.seg_no AS from_seg_no, a.wsg_id AS to_wsg_id, a.ws_key AS to_ws_key
+    FROM endpoints e 
+    JOIN lwss b 
+    USING (wsg_id, ws_key, seg_no, l_magnitud)
+    JOIN lwss a
+    ON a.geom && ST_Expand(b.geom, 1)
+    AND ST_Distance(ST_EndPoint(a.geom), ST_StartPoint(b.geom)) < 1
+    ORDER BY from_wsg_id, from_ws_key
+  ),
+  downstream_seg_candidates AS (
+    SELECT 
+      d.from_wsg_id, d.from_ws_key, d.from_seg_no, 
+      d.to_wsg_id, d.to_ws_key, l.seg_no AS to_seg_no
+    FROM lwss l JOIN downstream_ws_keys d
+    ON ST_DWithin(d.geom, l.geom, 500)
+    WHERE l.bl_key = l.ws_key
+    AND l.ws_key = d.to_ws_key
+    AND l.wsg_id = d.to_wsg_id
+    ORDER BY from_wsg_id, from_ws_key, from_seg_no, to_wsg_id, to_ws_key, 
+             ST_Distance(ST_EndPoint(l.geom), ST_StartPoint(d.geom))
+  )
+  SELECT DISTINCT ON (from_wsg_id, from_ws_key, from_seg_no) * FROM downstream_seg_candidates;
 
-::
+  -- Index the from/to table
+  CREATE INDEX lwss_from_to_idx ON lwss_from_to (from_wsg_id, from_ws_key);
 
-  -- We need a table structure to define the output of our query building
-  -- function
-  DROP IF EXISTS TABLE wsquery;
-  CREATE TABLE wsquery (ws_code varchar(45), seg_prop varchar(6));
+  -- How to use the support table, recurse on it to find all downstream 
+  -- rivers from your start point, then join on the main table 
+  -- to get all the segments in each river
+  WITH RECURSIVE from_to AS (
+    SELECT 'LNIC'::varchar AS wsg_id, 319 AS ws_key, 1 AS seg_no
+    UNION
+    SELECT to_wsg_id AS wsg_id, to_ws_key AS ws_key, to_seg_no AS seg_no
+    FROM lwss_from_to l JOIN from_to f
+    ON l.from_wsg_id = f.wsg_id AND l.from_ws_key = f.ws_key
+  )
+  SELECT 
+    l.gid, l.geom, l.gaze_name, l.ws_code, 
+    l.wsg_id, l.ws_key, l.seg_no, l.l_order 
+  FROM lwss l JOIN from_to f 
+  ON l.wsg_id = f.wsg_id 
+  AND l.ws_key = f.ws_key 
+  AND l.seg_no <= f.seg_no
+  WHERE l.bl_key = l.ws_key
 
-  -- Query building function takes a watershed code and proportion up it, and 
-  -- generates a set of codes and proportions that can be used to find all the 
-  -- downstream segments.
-  CREATE OR REPLACE FUNCTION get_wsquery(varchar,varchar) RETURNS SETOF wsquery AS
-  $BODY$
-  DECLARE
-      ws_code varchar := $1;
-      seg_prop varchar := $2;
-      ws_sizes integer[] := ARRAY[6,5,5,4,4,3,3,3,3,3,3];
-      result wsquery;
-      ws_len integer;
-      ws_size integer := 3;
-      ws_pos integer := 4;
-  BEGIN
-
-      result.seg_prop := seg_prop;
-      result.ws_code := ws_code;
-      RETURN NEXT result;
-
-      FOREACH ws_len IN ARRAY ws_sizes
-      LOOP
-          result.seg_prop := substring(ws_code from ws_pos for ws_len);
-          result.ws_code := substring(ws_code from 1 for ws_size) || repeat('0', 45 - ws_size);
-          IF int4(result.seg_prop) = 0 THEN
-              RETURN;
-          END IF;
-          ws_size := ws_size + ws_len;
-          ws_pos := ws_size + 1;
-          RETURN NEXT result;
-      END LOOP;
-      RETURN;
-  END
-  $BODY$
-  LANGUAGE plpgsql;
-
-  -- How to use the query, just join it to the master table
-  -- and find all the lines with the same watershed codes and proportions less than the 
-  -- thresholds.
-  SELECT s.geom, s.gaze_name, s.ws_code, s.seg_prop 
-  FROM lwss s 
-  JOIN get_wsquery('120246600115000900000000000000000000000000000','0140') q
-  ON s.ws_code = q.ws_code and s.seg_prop < q.seg_prop
-  ORDER BY ws_code DESC, seg_prop DESC;
 
 
 SQL View Queries
@@ -180,12 +190,32 @@ lwss_downstream
 ---------------
 
 ::
-
-  # default values ws_code = 120246600115000900000000000000000000000000000, seg_prop = 0140
-  SELECT s.geom, s.gaze_name, s.ws_code, s.seg_prop 
-  FROM lwss s 
-  JOIN get_wsquery('%ws_code%','%seg_prop%') q
-  ON s.ws_code = q.ws_code and s.seg_prop < q.seg_prop;
+  -- use the following values as defaults and regex
+  -- filters for security on the parameters
+  -- ws_key  319   ^[\d]+$ 
+  -- seg_no  1     ^[\d]+$ 
+  -- wsg_id  LNIC  ^[\w]+$ 
+  WITH RECURSIVE from_to AS (
+    SELECT 
+      '%wsg_id%'::varchar AS wsg_id, 
+      %ws_key% AS ws_key, 
+      %seg_no% AS seg_no
+    UNION
+    SELECT 
+      to_wsg_id AS wsg_id, 
+      to_ws_key AS ws_key, 
+      to_seg_no AS seg_no
+    FROM lwss_from_to l JOIN from_to f
+    ON l.from_wsg_id = f.wsg_id AND l.from_ws_key = f.ws_key
+  )
+  SELECT 
+    l.gid, l.geom, l.gaze_name, l.ws_code, 
+    l.wsg_id, l.ws_key, l.seg_no, l.l_order 
+  FROM lwss l JOIN from_to f 
+  ON l.wsg_id = f.wsg_id 
+  AND l.ws_key = f.ws_key 
+  AND l.seg_no <= f.seg_no
+  WHERE l.bl_key = l.ws_key
 
 
 points_of_diversion_affected
@@ -193,33 +223,43 @@ points_of_diversion_affected
 
 ::
 
-  # default values ws_code = 120246600115000900000000000000000000000000000, seg_prop = 0140
-  # radius = 500
-  WITH downstream AS (
-    SELECT s.geom, s.gaze_name, s.ws_code, s.seg_prop 
-    FROM lwss s 
-    JOIN get_wsquery('%ws_code%','%seg_prop%') q
-    ON s.ws_code = q.ws_code and s.seg_prop < q.seg_prop
+  -- use the following values as defaults and regex
+  -- filters for security on the parameters
+  -- ws_key  319   ^[\d]+$ 
+  -- seg_no  1     ^[\d]+$ 
+  -- wsg_id  LNIC  ^[\w]+$ 
+  -- radius  300   ^[\d]+$ 
+  WITH RECURSIVE from_to AS (
+    SELECT 
+      '%wsg_id%'::varchar AS wsg_id, 
+      %ws_key% AS ws_key, 
+      %seg_no% AS seg_no
+    UNION
+    SELECT 
+      to_wsg_id AS wsg_id, 
+      to_ws_key AS ws_key, 
+      to_seg_no AS seg_no
+    FROM lwss_from_to l JOIN from_to f
+    ON l.from_wsg_id = f.wsg_id AND l.from_ws_key = f.ws_key
+  ),
+  downstream AS
+  (
+    SELECT
+      l.gid, l.geom, l.gaze_name, l.ws_code, 
+      l.wsg_id, l.ws_key, l.seg_no, l.l_order 
+    FROM lwss l JOIN from_to f 
+    ON l.wsg_id = f.wsg_id 
+    AND l.ws_key = f.ws_key 
+    AND l.seg_no <= f.seg_no
+    WHERE l.bl_key = l.ws_key
   )
-  SELECT DISTINCT ON (tpod_tag) 
-    ogc_fid, wkb_geometry, licence_no, purpose, 
-    strm_name, licensee, ddrssln1, ddrssln2
-  FROM points_of_diversion 
+  SELECT DISTINCT ON (tpod_tag)
+    p.gid, p.geom, p.licence_no, p.purpose, 
+    p.strm_name, p.licensee, p.ddrssln1, p.ddrssln2
+  FROM points_of_diversion p
   JOIN downstream 
-  ON ST_DWithin(downstream.geom, points_of_diversion.geom, %radius%)
+  ON ST_DWithin(downstream.geom, p.geom, %radius%)
   WHERE lic_status = 'CURRENT'
-
-
-lwss_downstream_vector
-----------------------
-
-::
-
-  # default values ws_code = 120246600115000900000000000000000000000000000, seg_prop = 0140
-  SELECT ST_Collect(s.geom) AS geom
-  FROM lwss s 
-  JOIN get_wsquery('%ws_code%','%seg_prop%') q
-  ON s.ws_code = q.ws_code and s.seg_prop < q.seg_prop;
 
 
 
