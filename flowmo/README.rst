@@ -160,7 +160,7 @@ The from/to table calculation is a little complex::
   -- Index the from/to table
   CREATE INDEX lwss_from_to_idx ON lwss_from_to (from_wsg_id, from_ws_key);
 
-  -- How to use the support table, recurse on it to find all downstream 
+  -- How to use the from/to table: recurse on it to find all downstream 
   -- rivers from your start point, then join on the main table 
   -- to get all the segments in each river
   WITH RECURSIVE from_to AS (
