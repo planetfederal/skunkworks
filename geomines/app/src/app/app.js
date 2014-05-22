@@ -32,7 +32,7 @@ var app = (function() {
     } else {
       flaggedCountries.splice(index, 1);
     }
-    flagged.updateParams({FEATUREID: flaggedCountries.join(',') + ','});
+    minefield.dispatchChangeEvent();
     if (flaggedCountries.length == minedCountries.length) {
       var won = true;
       for (var i = minedCountries.length - 1; i >= 0; --i) {
@@ -54,7 +54,6 @@ var app = (function() {
         clearedCountries.push(fid);
       }
     }
-    cleared.updateParams({FEATUREID: clearedCountries.join(',') + ','});
     minefield.dispatchChangeEvent();
   }
 
@@ -89,28 +88,6 @@ var app = (function() {
     });
   });
 
-  var cleared = new ol.source.ImageWMS({
-    url: '/geoserver/wms',
-    params: {
-      LAYERS: 'geomines:sweep',
-      FORMAT: 'image/png8',
-      STYLES: 'clear_countries',
-      VIEWPARAMS: 'table:' + table,
-      FEATUREID: ','
-    }
-  });
-
-  var flagged = new ol.source.ImageWMS({
-    url: '/geoserver/wms',
-    params: {
-      LAYERS: 'geomines:sweep',
-      FORMAT: 'image/png8',
-      STYLES: 'flagged_countries',
-      VIEWPARAMS: 'table:' + table,
-      FEATUREID: ','
-    }
-  });
-
   var map = new ol.Map({
     view: new ol.View2D({
       projection: 'EPSG:4326',
@@ -131,25 +108,28 @@ var app = (function() {
           }
         })
       }),
-      new ol.layer.Image({
-        visible: false,
-        source: cleared
-      }),
-      new ol.layer.Image({
-        visible: false,
-        source: flagged
-      }),
       new ol.layer.Vector({
         visible: false,
         source: minefield,
         style: (function() {
           var styleCache = {};
+          var flagged = [new ol.style.Style({
+            fill: new ol.style.Fill({color: '#e75c55'})
+          })];
           return function(feature, resolution) {
-            var text = clearedCountries.indexOf(feature.get('fid')) > - 1 ?
-                (getMinedNeighbours(feature).length || '') + '' : '';
+            var fid = feature.get('fid');
+            if (flaggedCountries.indexOf(fid) > -1) {
+              return flagged;
+            }
+            var cleared = clearedCountries.indexOf(fid) > - 1;
+            var text =  cleared ?
+                (getMinedNeighbours(feature).length || '') + '' :
+                '';
             if (!styleCache[text]) {
               styleCache[text] = [new ol.style.Style({
-                fill: new ol.style.Fill({color: 'rgba(0, 0, 0, 0)'}),
+                fill: cleared ?
+                    new ol.style.Fill({color: '#b8b672'}) :
+                    new ol.style.Fill({color: 'rgba(0, 0, 0, 0)'}),
                 text: new ol.style.Text({
                   font: '12px Calibri,sans-serif',
                   text: text,
