@@ -24,6 +24,7 @@
             <Stroke>
               <CssParameter name="stroke">#FF0000</CssParameter>
               <CssParameter name="stroke-width">6</CssParameter>
+              <CssParameter name="stroke-linecap">round</CssParameter>
             </Stroke>
           </LineSymbolizer>
         </Rule>

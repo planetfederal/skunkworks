@@ -42,14 +42,19 @@
 
         <!-- Zoom 8+ -->
         <Rule>
-          <!-- like a polygonsymbolizer -->
 
-          <!-- <ogc:Filter>
-            <ogc:PropertyIsEqualTo>
-              <ogc:PropertyName>type</ogc:PropertyName>
-              <ogc:Literal>1</ogc:Literal>
-            </ogc:PropertyIsEqualTo>
-          </ogc:Filter> -->
+          <ogc:Filter>
+            <ogc:And>
+              <ogc:PropertyIsNotEqualTo>
+                <ogc:PropertyName>code</ogc:PropertyName>
+                <ogc:Literal>1400</ogc:Literal>
+              </ogc:PropertyIsNotEqualTo>
+              <ogc:PropertyIsGreaterThanOrEqualTo>
+                <ogc:PropertyName>l_order</ogc:PropertyName>
+                <ogc:Literal>4</ogc:Literal>
+              </ogc:PropertyIsGreaterThanOrEqualTo>
+            </ogc:And>
+          </ogc:Filter>
 
           <MinScaleDenominator>3000000</MinScaleDenominator>
 
@@ -57,6 +62,7 @@
             <Stroke>
               <CssParameter name="stroke">#1122EE</CssParameter>
               <CssParameter name="stroke-width">0.2</CssParameter>
+              <CssParameter name="stroke-linecap">round</CssParameter>
             </Stroke>
           </LineSymbolizer>
 
@@ -64,14 +70,19 @@
 
         <!-- Zoom 9 -->
         <Rule>
-          <!-- like a polygonsymbolizer -->
 
-          <!-- <ogc:Filter>
-            <ogc:PropertyIsEqualTo>
-              <ogc:PropertyName>type</ogc:PropertyName>
-              <ogc:Literal>1</ogc:Literal>
-            </ogc:PropertyIsEqualTo>
-          </ogc:Filter> -->
+          <ogc:Filter>
+            <ogc:And>
+              <ogc:PropertyIsNotEqualTo>
+                <ogc:PropertyName>code</ogc:PropertyName>
+                <ogc:Literal>1400</ogc:Literal>
+              </ogc:PropertyIsNotEqualTo>
+              <ogc:PropertyIsGreaterThanOrEqualTo>
+                <ogc:PropertyName>l_order</ogc:PropertyName>
+                <ogc:Literal>3</ogc:Literal>
+              </ogc:PropertyIsGreaterThanOrEqualTo>
+            </ogc:And>
+          </ogc:Filter>
 
           <MinScaleDenominator>1500000</MinScaleDenominator>
           <MaxScaleDenominator>3000000</MaxScaleDenominator>
@@ -81,6 +92,7 @@
             <Stroke>
               <CssParameter name="stroke">#1122EE</CssParameter>
               <CssParameter name="stroke-width">0.2</CssParameter>
+              <CssParameter name="stroke-linecap">round</CssParameter>
             </Stroke>
           </LineSymbolizer>
 
@@ -90,12 +102,18 @@
         <!-- Zoom 10 -->
         <Rule>
           
-          <!-- <ogc:Filter>
-            <ogc:PropertyIsEqualTo>
-              <ogc:PropertyName>type</ogc:PropertyName>
-              <ogc:Literal>1</ogc:Literal>
-            </ogc:PropertyIsEqualTo>
-          </ogc:Filter> -->
+          <ogc:Filter>
+            <ogc:And>
+              <ogc:PropertyIsNotEqualTo>
+                <ogc:PropertyName>code</ogc:PropertyName>
+                <ogc:Literal>1400</ogc:Literal>
+              </ogc:PropertyIsNotEqualTo>
+              <ogc:PropertyIsGreaterThanOrEqualTo>
+                <ogc:PropertyName>l_order</ogc:PropertyName>
+                <ogc:Literal>3</ogc:Literal>
+              </ogc:PropertyIsGreaterThanOrEqualTo>
+            </ogc:And>
+          </ogc:Filter>
           
           <MinScaleDenominator>800000</MinScaleDenominator>
           <MaxScaleDenominator>1500000</MaxScaleDenominator>
@@ -105,6 +123,7 @@
             <Stroke>
               <CssParameter name="stroke">#1122EE</CssParameter>
               <CssParameter name="stroke-width">0.4</CssParameter>
+              <CssParameter name="stroke-linecap">round</CssParameter>
             </Stroke>
           </LineSymbolizer>
         </Rule>
@@ -112,12 +131,18 @@
         <!-- Zoom 11 -->
         <Rule>
           
-          <!-- <ogc:Filter>
-            <ogc:PropertyIsEqualTo>
-              <ogc:PropertyName>type</ogc:PropertyName>
-              <ogc:Literal>1</ogc:Literal>
-            </ogc:PropertyIsEqualTo>
-          </ogc:Filter> -->
+          <ogc:Filter>
+            <ogc:And>
+              <ogc:PropertyIsNotEqualTo>
+                <ogc:PropertyName>code</ogc:PropertyName>
+                <ogc:Literal>1400</ogc:Literal>
+              </ogc:PropertyIsNotEqualTo>
+              <ogc:PropertyIsGreaterThanOrEqualTo>
+                <ogc:PropertyName>l_order</ogc:PropertyName>
+                <ogc:Literal>2</ogc:Literal>
+              </ogc:PropertyIsGreaterThanOrEqualTo>
+            </ogc:And>
+          </ogc:Filter>
           
           <MinScaleDenominator>350000</MinScaleDenominator>
           <MaxScaleDenominator>800000</MaxScaleDenominator>
@@ -127,6 +152,7 @@
             <Stroke>
               <CssParameter name="stroke">#1122EE</CssParameter>
               <CssParameter name="stroke-width">0.8</CssParameter>
+              <CssParameter name="stroke-linecap">round</CssParameter>
             </Stroke>
           </LineSymbolizer>
         </Rule>
@@ -134,12 +160,18 @@
         <!-- Zoom 12 -->
         <Rule>
           
-          <!-- <ogc:Filter>
-            <ogc:PropertyIsEqualTo>
-              <ogc:PropertyName>type</ogc:PropertyName>
-              <ogc:Literal>1</ogc:Literal>
-            </ogc:PropertyIsEqualTo>
-          </ogc:Filter> -->
+          <ogc:Filter>
+            <ogc:And>
+              <ogc:PropertyIsNotEqualTo>
+                <ogc:PropertyName>code</ogc:PropertyName>
+                <ogc:Literal>1400</ogc:Literal>
+              </ogc:PropertyIsNotEqualTo>
+              <ogc:PropertyIsGreaterThanOrEqualTo>
+                <ogc:PropertyName>l_order</ogc:PropertyName>
+                <ogc:Literal>2</ogc:Literal>
+              </ogc:PropertyIsGreaterThanOrEqualTo>
+            </ogc:And>
+          </ogc:Filter>
           
           <MinScaleDenominator>220000</MinScaleDenominator>
           <MaxScaleDenominator>350000</MaxScaleDenominator>
@@ -149,6 +181,7 @@
             <Stroke>
               <CssParameter name="stroke">#1122EE</CssParameter>
               <CssParameter name="stroke-width">1</CssParameter>
+              <CssParameter name="stroke-linecap">round</CssParameter>
             </Stroke>
           </LineSymbolizer>
         </Rule>
@@ -156,12 +189,18 @@
         <!-- Zoom 13 -->
         <Rule>
           
-          <!-- <ogc:Filter>
-            <ogc:PropertyIsEqualTo>
-              <ogc:PropertyName>type</ogc:PropertyName>
-              <ogc:Literal>1</ogc:Literal>
-            </ogc:PropertyIsEqualTo>
-          </ogc:Filter> -->
+          <ogc:Filter>
+            <ogc:And>
+              <ogc:PropertyIsNotEqualTo>
+                <ogc:PropertyName>code</ogc:PropertyName>
+                <ogc:Literal>1400</ogc:Literal>
+              </ogc:PropertyIsNotEqualTo>
+              <ogc:PropertyIsGreaterThanOrEqualTo>
+                <ogc:PropertyName>l_order</ogc:PropertyName>
+                <ogc:Literal>2</ogc:Literal>
+              </ogc:PropertyIsGreaterThanOrEqualTo>
+            </ogc:And>
+          </ogc:Filter>
           
           <MinScaleDenominator>100000</MinScaleDenominator>
           <MaxScaleDenominator>220000</MaxScaleDenominator>
@@ -170,13 +209,14 @@
           <LineSymbolizer>
             <Stroke>
               <CssParameter name="stroke">#1122EE</CssParameter>
-              <CssParameter name="stroke-width">2</CssParameter>
+              <CssParameter name="stroke-width">1.5</CssParameter>
+              <CssParameter name="stroke-linecap">round</CssParameter>
             </Stroke>
           </LineSymbolizer>
           
           <TextSymbolizer>
             <Label>
-              <ogc:PropertyName>gzttdnm</ogc:PropertyName>
+              <ogc:PropertyName>gaze_name</ogc:PropertyName>
             </Label>
             <Font>
               <CssParameter name="font-family">Dialog</CssParameter>
@@ -209,12 +249,18 @@
         <!-- Zoom 14 -->
         <Rule>
           
-          <!-- <ogc:Filter>
-            <ogc:PropertyIsEqualTo>
-              <ogc:PropertyName>type</ogc:PropertyName>
-              <ogc:Literal>1</ogc:Literal>
-            </ogc:PropertyIsEqualTo>
-          </ogc:Filter> -->
+          <ogc:Filter>
+            <ogc:And>
+              <ogc:PropertyIsNotEqualTo>
+                <ogc:PropertyName>code</ogc:PropertyName>
+                <ogc:Literal>1400</ogc:Literal>
+              </ogc:PropertyIsNotEqualTo>
+              <ogc:PropertyIsGreaterThanOrEqualTo>
+                <ogc:PropertyName>l_order</ogc:PropertyName>
+                <ogc:Literal>2</ogc:Literal>
+              </ogc:PropertyIsGreaterThanOrEqualTo>
+            </ogc:And>
+          </ogc:Filter>
           
           <MinScaleDenominator>50000</MinScaleDenominator>
           <MaxScaleDenominator>100000</MaxScaleDenominator>
@@ -223,13 +269,14 @@
           <LineSymbolizer>
             <Stroke>
               <CssParameter name="stroke">#1122EE</CssParameter>
-              <CssParameter name="stroke-width">3</CssParameter>
+              <CssParameter name="stroke-width">2</CssParameter>
+              <CssParameter name="stroke-linecap">round</CssParameter>
             </Stroke>
           </LineSymbolizer>
 
           <TextSymbolizer>
             <Label>
-              <ogc:PropertyName>gzttdnm</ogc:PropertyName>
+              <ogc:PropertyName>gaze_name</ogc:PropertyName>
             </Label>
             <Font>
               <CssParameter name="font-family">Dialog</CssParameter>
@@ -263,12 +310,12 @@
         <!-- Zoom 15+ -->
         <Rule>
           
-          <!-- <ogc:Filter>
-            <ogc:PropertyIsEqualTo>
-              <ogc:PropertyName>type</ogc:PropertyName>
-              <ogc:Literal>1</ogc:Literal>
-            </ogc:PropertyIsEqualTo>
-          </ogc:Filter> -->
+          <ogc:Filter>
+            <ogc:PropertyIsNotEqualTo>
+              <ogc:PropertyName>code</ogc:PropertyName>
+              <ogc:Literal>1400</ogc:Literal>
+            </ogc:PropertyIsNotEqualTo>
+          </ogc:Filter>
           
           <MaxScaleDenominator>50000</MaxScaleDenominator>
 
@@ -276,12 +323,13 @@
           <LineSymbolizer>
             <Stroke>
               <CssParameter name="stroke">#1122EE</CssParameter>
-              <CssParameter name="stroke-width">4</CssParameter>
+              <CssParameter name="stroke-width">3</CssParameter>
+              <CssParameter name="stroke-linecap">round</CssParameter>
             </Stroke>
           </LineSymbolizer>
           <TextSymbolizer>
             <Label>
-              <ogc:PropertyName>gzttdnm</ogc:PropertyName>
+              <ogc:PropertyName>gaze_name</ogc:PropertyName>
             </Label>
             <Font>
               <CssParameter name="font-family">Dialog</CssParameter>

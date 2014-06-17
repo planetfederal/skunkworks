@@ -520,9 +520,9 @@ goog.addDependency("../build/exports.js", [], ["ol", "ol.Attribution", "ol.Brows
 "ol.control.Zoom", "ol.control.ZoomSlider", "ol.control.ZoomToExtent", "ol.coordinate", "ol.dom.Input", "ol.dom.InputProperty", "ol.easing", "ol.events.ConditionType", "ol.events.condition", "ol.extent", "ol.extent.Relationship", "ol.feature", "ol.format.GPX", "ol.format.GPX.V1_1", "ol.format.GeoJSON", "ol.format.IGC", "ol.format.IGCZ", "ol.format.KML", "ol.format.OSMXML", "ol.format.TopoJSON", "ol.format.WFS", "ol.format.WMSCapabilities", "ol.geom.Circle", "ol.geom.Geometry", "ol.geom.GeometryCollection", 
 "ol.geom.GeometryType", "ol.geom.LineString", "ol.geom.LinearRing", "ol.geom.MultiLineString", "ol.geom.MultiPoint", "ol.geom.MultiPolygon", "ol.geom.Point", "ol.geom.Polygon", "ol.geom.SimpleGeometry", "ol.interaction", "ol.interaction.DoubleClickZoom", "ol.interaction.DragAndDrop", "ol.interaction.DragAndDropEvent", "ol.interaction.DragBox", "ol.interaction.DragPan", "ol.interaction.DragRotate", "ol.interaction.DragRotateAndZoom", "ol.interaction.DragZoom", "ol.interaction.Draw", "ol.interaction.KeyboardPan", 
 "ol.interaction.KeyboardZoom", "ol.interaction.Modify", "ol.interaction.MouseWheelZoom", "ol.interaction.PinchRotate", "ol.interaction.PinchZoom", "ol.interaction.Select", "ol.layer.Base", "ol.layer.Group", "ol.layer.Heatmap", "ol.layer.Image", "ol.layer.Layer", "ol.layer.LayerProperty", "ol.layer.LayerState", "ol.layer.Tile", "ol.layer.Vector", "ol.loadingstrategy", "ol.proj", "ol.proj.CH", "ol.proj.EPSG2056", "ol.proj.EPSG21781", "ol.proj.EPSG3857", "ol.proj.EPSG4326", "ol.proj.METERS_PER_UNIT", 
-"ol.proj.Projection", "ol.proj.ProjectionLike", "ol.proj.Units", "ol.proj.common", "ol.render.canvas.Immediate", "ol.source.BingMaps", "ol.source.GPX", "ol.source.GeoJSON", "ol.source.IGC", "ol.source.ImageCanvas", "ol.source.ImageStatic", "ol.source.ImageVector", "ol.source.ImageWMS", "ol.source.KML", "ol.source.MapGuide", "ol.source.MapQuest", "ol.source.OSM", "ol.source.OSMXML", "ol.source.ServerVector", "ol.source.Source", "ol.source.Stamen", "ol.source.State", "ol.source.StaticVector", "ol.source.Tile", 
-"ol.source.TileDebug", "ol.source.TileImage", "ol.source.TileJSON", "ol.source.TileOptions", "ol.source.TileVector", "ol.source.TileWMS", "ol.source.TopoJSON", "ol.source.Vector", "ol.source.VectorEvent", "ol.source.VectorEventType", "ol.source.WMTS", "ol.source.WMTSRequestEncoding", "ol.source.XYZ", "ol.source.Zoomify", "ol.sphere.WGS84", "ol.style.Circle", "ol.style.Fill", "ol.style.Icon", "ol.style.IconAnchorOrigin", "ol.style.IconAnchorUnits", "ol.style.IconImageCache", "ol.style.Image", "ol.style.ImageState", 
-"ol.style.Stroke", "ol.style.Style", "ol.style.Text", "ol.tilegrid.TileGrid", "ol.tilegrid.WMTS", "ol.tilegrid.XYZ", "ol.tilegrid.Zoomify", "ol.tilejson", "ol.webgl.Context"]);
+"ol.proj.Projection", "ol.proj.ProjectionLike", "ol.proj.Units", "ol.proj.common", "ol.render.canvas.Immediate", "ol.source.BingMaps", "ol.source.FormatVector", "ol.source.GPX", "ol.source.GeoJSON", "ol.source.IGC", "ol.source.ImageCanvas", "ol.source.ImageStatic", "ol.source.ImageVector", "ol.source.ImageWMS", "ol.source.KML", "ol.source.MapGuide", "ol.source.MapQuest", "ol.source.OSM", "ol.source.OSMXML", "ol.source.ServerVector", "ol.source.Source", "ol.source.Stamen", "ol.source.State", "ol.source.StaticVector", 
+"ol.source.Tile", "ol.source.TileDebug", "ol.source.TileImage", "ol.source.TileJSON", "ol.source.TileOptions", "ol.source.TileVector", "ol.source.TileWMS", "ol.source.TopoJSON", "ol.source.Vector", "ol.source.VectorEvent", "ol.source.VectorEventType", "ol.source.WMTS", "ol.source.WMTSRequestEncoding", "ol.source.XYZ", "ol.source.Zoomify", "ol.sphere.WGS84", "ol.style.Circle", "ol.style.Fill", "ol.style.Icon", "ol.style.IconAnchorOrigin", "ol.style.IconAnchorUnits", "ol.style.IconImageCache", "ol.style.Image", 
+"ol.style.ImageState", "ol.style.Stroke", "ol.style.Style", "ol.style.Text", "ol.tilegrid.TileGrid", "ol.tilegrid.WMTS", "ol.tilegrid.XYZ", "ol.tilegrid.Zoomify", "ol.tilejson", "ol.webgl.Context"]);
 goog.addDependency("../src/googx/dom/fullscreen.js", ["googx.dom.fullscreen", "googx.dom.fullscreen.EventType"], ["goog.dom", "goog.userAgent"]);
 goog.addDependency("../src/libtess.js/dict/Dict.js", ["libtess.Dict"], ["libtess", "libtess.DictNode"]);
 goog.addDependency("../src/libtess.js/dict/DictNode.js", ["libtess.DictNode"], ["libtess"]);
@@ -13471,7 +13471,8 @@ ol.style.Circle = function(opt_options) {
   var size = this.render_();
   this.anchor_ = [size / 2, size / 2];
   this.size_ = [size, size];
-  goog.base(this, {opacity:1, origin:[0, 0], rotateWithView:false, rotation:0, scale:1, snapToPixel:undefined})
+  var snapToPixel = goog.isDef(options.snapToPixel) ? options.snapToPixel : true;
+  goog.base(this, {opacity:1, origin:[0, 0], rotateWithView:false, rotation:0, scale:1, snapToPixel:snapToPixel})
 };
 goog.inherits(ol.style.Circle, ol.style.Image);
 ol.style.Circle.prototype.getAnchor = function() {
@@ -19161,7 +19162,8 @@ ol.style.Icon = function(opt_options) {
   var rotateWithView = goog.isDef(options.rotateWithView) ? options.rotateWithView : false;
   var rotation = goog.isDef(options.rotation) ? options.rotation : 0;
   var scale = goog.isDef(options.scale) ? options.scale : 1;
-  goog.base(this, {opacity:opacity, origin:origin, rotation:rotation, scale:scale, snapToPixel:undefined, rotateWithView:rotateWithView})
+  var snapToPixel = goog.isDef(options.snapToPixel) ? options.snapToPixel : true;
+  goog.base(this, {opacity:opacity, origin:origin, rotation:rotation, scale:scale, snapToPixel:snapToPixel, rotateWithView:rotateWithView})
 };
 goog.inherits(ol.style.Icon, ol.style.Image);
 ol.style.Icon.prototype.getAnchor = function() {
@@ -19982,13 +19984,8 @@ ol.render.canvas.Immediate.prototype.setImageStyle = function(imageStyle) {
   }else {
     var imageAnchor = imageStyle.getAnchor();
     var imageImage = imageStyle.getImage(1);
-    var imageOpacity = imageStyle.getOpacity();
     var imageOrigin = imageStyle.getOrigin();
-    var imageRotateWithView = imageStyle.getRotateWithView();
-    var imageRotation = imageStyle.getRotation();
-    var imageScale = imageStyle.getScale();
     var imageSize = imageStyle.getSize();
-    var imageSnapToPixel = imageStyle.getSnapToPixel();
     goog.asserts.assert(!goog.isNull(imageAnchor));
     goog.asserts.assert(!goog.isNull(imageImage));
     goog.asserts.assert(!goog.isNull(imageOrigin));
@@ -19997,13 +19994,13 @@ ol.render.canvas.Immediate.prototype.setImageStyle = function(imageStyle) {
     this.imageAnchorY_ = imageAnchor[1];
     this.imageHeight_ = imageSize[1];
     this.image_ = imageImage;
-    this.imageOpacity_ = goog.isDef(imageOpacity) ? imageOpacity : 1;
+    this.imageOpacity_ = imageStyle.getOpacity();
     this.imageOriginX_ = imageOrigin[0];
     this.imageOriginY_ = imageOrigin[1];
-    this.imageRotateWithView_ = goog.isDef(imageRotateWithView) ? imageRotateWithView : false;
-    this.imageRotation_ = goog.isDef(imageRotation) ? imageRotation : 0;
-    this.imageScale_ = goog.isDef(imageScale) ? imageScale : 1;
-    this.imageSnapToPixel_ = goog.isDef(imageSnapToPixel) ? imageSnapToPixel : false;
+    this.imageRotateWithView_ = imageStyle.getRotateWithView();
+    this.imageRotation_ = imageStyle.getRotation();
+    this.imageScale_ = imageStyle.getScale();
+    this.imageSnapToPixel_ = imageStyle.getSnapToPixel();
     this.imageWidth_ = imageSize[0]
   }
 };
@@ -20598,7 +20595,7 @@ ol.render.canvas.Replay.prototype.replay_ = function(context, pixelRatio, transf
         var image = (instruction[3]);
         var anchorX = (instruction[4]) * pixelRatio;
         var anchorY = (instruction[5]) * pixelRatio;
-        var height = (instruction[6]) * pixelRatio;
+        var height = (instruction[6]);
         var opacity = (instruction[7]);
         var originX = (instruction[8]);
         var originY = (instruction[9]);
@@ -20606,7 +20603,7 @@ ol.render.canvas.Replay.prototype.replay_ = function(context, pixelRatio, transf
         var rotation = (instruction[11]);
         var scale = (instruction[12]);
         var snapToPixel = (instruction[13]);
-        var width = (instruction[14]) * pixelRatio;
+        var width = (instruction[14]);
         if(rotateWithView) {
           rotation += viewRotation
         }
@@ -20627,7 +20624,7 @@ ol.render.canvas.Replay.prototype.replay_ = function(context, pixelRatio, transf
           if(opacity != 1) {
             context.globalAlpha = alpha * opacity
           }
-          context.drawImage(image, originX, originY, width, height, x, y, width, height);
+          context.drawImage(image, originX, originY, width, height, x, y, width * pixelRatio, height * pixelRatio);
           if(opacity != 1) {
             context.globalAlpha = alpha
           }
@@ -36422,6 +36419,7 @@ goog.require("ol.proj.Units");
 goog.require("ol.proj.common");
 goog.require("ol.render.canvas.Immediate");
 goog.require("ol.source.BingMaps");
+goog.require("ol.source.FormatVector");
 goog.require("ol.source.GPX");
 goog.require("ol.source.GeoJSON");
 goog.require("ol.source.IGC");
@@ -36478,6 +36476,7 @@ goog.exportSymbol("ol.BrowserFeature.HAS_CANVAS", ol.BrowserFeature.HAS_CANVAS);
 goog.exportSymbol("ol.BrowserFeature.HAS_DEVICE_ORIENTATION", ol.BrowserFeature.HAS_DEVICE_ORIENTATION);
 goog.exportSymbol("ol.BrowserFeature.HAS_GEOLOCATION", ol.BrowserFeature.HAS_GEOLOCATION);
 goog.exportSymbol("ol.BrowserFeature.HAS_TOUCH", ol.BrowserFeature.HAS_TOUCH);
+goog.exportSymbol("ol.BrowserFeature.HAS_WEBGL", ol.BrowserFeature.HAS_WEBGL);
 goog.exportSymbol("ol.Collection", ol.Collection);
 goog.exportProperty(ol.Collection.prototype, "bindTo", ol.Collection.prototype.bindTo);
 goog.exportProperty(ol.Collection.prototype, "clear", ol.Collection.prototype.clear);
@@ -37607,6 +37606,7 @@ goog.exportProperty(ol.source.FormatVector.prototype, "getFeaturesAtCoordinate",
 goog.exportProperty(ol.source.FormatVector.prototype, "getState", ol.source.FormatVector.prototype.getState);
 goog.exportProperty(ol.source.FormatVector.prototype, "on", ol.source.FormatVector.prototype.on);
 goog.exportProperty(ol.source.FormatVector.prototype, "once", ol.source.FormatVector.prototype.once);
+goog.exportProperty(ol.source.FormatVector.prototype, "readFeatures", ol.source.FormatVector.prototype.readFeatures);
 goog.exportProperty(ol.source.FormatVector.prototype, "removeFeature", ol.source.FormatVector.prototype.removeFeature);
 goog.exportProperty(ol.source.FormatVector.prototype, "un", ol.source.FormatVector.prototype.un);
 goog.exportProperty(ol.source.FormatVector.prototype, "unByKey", ol.source.FormatVector.prototype.unByKey);
