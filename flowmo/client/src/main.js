@@ -1,7 +1,7 @@
 
 
-var baseUrl = 'http://flowmo.servebeer.com';
-//var baseUrl = 'http://localhost:8000/gs'
+var baseUrl = 'http://apps.opengeo.org';
+//var baseUrl = 'http://localhost:8000/gs';
 
 var wfsUrl = baseUrl + '/geoserver/wfs';
 
@@ -17,14 +17,14 @@ function downstreamStyles(feature, res) {
   })];
 }
 
-function getAffectedFeatures(gid) {
+function getAffectedFeatures(viewparams) {
   var params = {
     service: 'wfs',
     version: '2.0.0',
     request: 'GetFeature',
-    typeName: 'boundless:wsa_affected',
+    typeName: 'opengeo:points_of_diversion_affected',
     outputFormat: 'application/json',
-    viewparams: 'gid:' + gid
+    viewparams: viewparams
   };
 
   $.get(wfsUrl, params, function(res) {
@@ -32,15 +32,15 @@ function getAffectedFeatures(gid) {
   });
 }
 
-function getDownstreamFeaturesLayer(gid) {
+function getDownstreamFeaturesLayer(viewparams) {
   var params = {
     service: 'wfs',
     version: '2.0.0',
     request: 'GetFeature',
-    typeName: 'boundless:wsa_downstream_vector',
+    typeName: 'opengeo:lwss_downstream',
     outputFormat: 'application/json',
     srsname: 'EPSG:3857',
-    viewparams: 'gid:' + gid
+    viewparams: viewparams
   };
 
   $.get(wfsUrl, params, function(res) {
@@ -70,14 +70,14 @@ var view = new ol.View2D({
 
 var riverSource = new ol.source.TileWMS({
   url: baseUrl + '/geoserver/wms',
-  params: {'LAYERS': 'boundless:wsa_rivers', 'TILED': true},
+  params: {'LAYERS': 'opengeo:lwss', 'TILED': true},
   hidpi: false,
   serverType: 'geoserver'
 });
 
 var affectedSource = new ol.source.ImageWMS({
   url: baseUrl + '/geoserver/wms',
-  params: {'LAYERS': 'boundless:wsa_affected'},
+  params: {'LAYERS': 'opengeo:lwss_downstream'},
   serverType: 'geoserver'
 });
 
@@ -89,19 +89,33 @@ var affectedLayer = new ol.layer.Image({
 
 var vectorLayer;
 
-function updateStream(gid) {
-  if (gid) {
-    gid = gid.split('.')[1];
+function objToStr(obj) {
+  var str = '';
+  $.each(obj, function(k,v) {
+    str.length && (str += ';');
+    str += k + ':' + v;
+  });
+  return str;
+}
+
+function updateStream(feature) {
+  if (feature) {
+    var params = {
+      ws_key: feature.properties.ws_key,
+      seg_no: feature.properties.seg_no,
+      wsg_id: feature.properties.wsg_id
+    };
+    viewparams = objToStr(params);
     //downstreamSource.updateParams({'viewparams': 'gid:' + gid});
-    affectedSource.updateParams({'viewparams': 'gid:' + gid});
+    affectedSource.updateParams({'viewparams': viewparams});
 
     if (vectorLayer) {
       map.removeLayer(vectorLayer);
     }
-    getDownstreamFeaturesLayer(gid);
+    getDownstreamFeaturesLayer(viewparams);
 
     affectedLayer.setVisible(true);
-    getAffectedFeatures(gid);
+    getAffectedFeatures(viewparams);
   }
 }
 
@@ -135,7 +149,7 @@ function selectRiver(evt) {
 
   $.get(url, function(res) {
     if (res && res.features) {
-      updateStream(res.features[0].id);
+      updateStream(res.features[0]);
     }
   });
   mapEl.removeClass('crosshair');

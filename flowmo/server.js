@@ -18,7 +18,7 @@ http.createServer(function(req, res) {
     req.url = req.url.slice(3);
     console.log(req.url);
     proxy.web(req, res, {
-      target: 'http://flowmo.servebeer.com/'
+      target: 'http://apps.opengeo.org:8080/'
     });
   } else {
     proxy.web(req, res, {
