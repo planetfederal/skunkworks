@@ -6,15 +6,56 @@
   <title>Flomo</title>
   <link rel="stylesheet" href="../css/ol.css" type="text/css">
   <link rel="stylesheet" href="../css/main.css" type="text/css">
+  <link rel="stylesheet" href="../css/demo.css" type="text/css">
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="http://fontawesome.io/assets/font-awesome/css/font-awesome.css">
+  <!-- set min-width until responsive is in place -->
+  <style> body, #header,#footer,#container { min-width: 780px; } </style>
 </head>
 <body>
-  <div id="map" class="map"></div>
-  
-  <div class="panel">
-    <div class="go-btn">Select River</div>
-    <div id="info">
-      <ul class="feature-list">
-      </ul>
+  <div id="header">
+    <div class="contain">
+      <a href="#" class="logo"></a>
+      <div class="right">
+        <dropdown>
+          <input id="toggle2" type="checkbox">
+          <label for="toggle2" class="animate">Other Demos<i class="fa fa-sort-desc
+ float-right"></i></label>
+          <ul class="animate">
+            <li class="animate"><a href="#">Demo 1<i class="fa fa-code float-right"></i></a></li>
+            <li class="animate"><a href="#">Demo 2<i class="fa fa-arrows-alt float-right"></i></a></li>
+            <li class="animate"><a href="#">Demo 3<i class="fa fa-cog float-right"></i></a></li>
+          </ul>
+        </dropdown>
+        <a class="cta animate" href="#">Why OpenGeo Suite?</a>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div id="interior">
+
+        <div id="map" class="map"></div>
+        <div class="panel">
+          <div class="go-btn">Select River</div>
+          <div id="info">
+            <ul class="feature-list">
+            </ul>
+          </div>
+        </div>
+
+    </div>
+  </div>
+  <div id="footer">
+    <div class="contain">
+      <div class="boundless"><span>Powered by</span> <a href="#" class="logo"></a></div>
+      <div class="share">
+        <a href="#" class="btn social facebook animate"><i class="fa fa-facebook animate"></i>Share</a>
+        <a href="#" class="btn social twitter animate"><i class="fa fa-twitter animate"></i>Tweet</a>
+      </div>
+      <div class="rightbtns">
+        <a href="#" class="btn blue">View Source</a>
+        <a href="#" class="btn grey">Back to Overview</a>
+      </div>
     </div>
   </div>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>

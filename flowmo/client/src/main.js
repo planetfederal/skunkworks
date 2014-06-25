@@ -1,7 +1,7 @@
 
 
-var baseUrl = 'http://apps.opengeo.org';
-//var baseUrl = 'http://localhost:8000/gs';
+//var baseUrl = 'http://apps.opengeo.org';
+var baseUrl = 'http://localhost:8000/gs';
 
 var wfsUrl = baseUrl + '/geoserver/wfs';
 
