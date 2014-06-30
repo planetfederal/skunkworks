@@ -1,8 +1,5 @@
 (function() {
 
-  // TODO need to explicitly set map height?
-  // document.getElementById('map1123  //   //   // ').style.height = '500px';
-
   var extent3408 = [
     -4938036.174191093,
     -2573213.9925217666,
@@ -27,14 +24,14 @@
     extent: extent3413
   });
 
-  var wmsUrl = ('http://ec2-54-198-167-104.compute-1.amazonaws.com:8080' +
-                '/geoserver/opengeo/wms');
+  var wmsUrl = 'http://apps.boundlessgeo.com/geoserver/icecubed/wms';
+  var workspace = 'icecubed';
 
   var baseLayer = new ol.layer.Tile({
     source: new ol.source.TileWMS({
       url: wmsUrl,
       params: {
-        LAYERS: 'opengeo:ne1_3408_sea_ice',
+        LAYERS: workspace + ':NaturalEarth1_3408_basemap',
         TILED: true
       },
       extent: extent3408,
@@ -64,7 +61,7 @@
       source: new ol.source.TileWMS({
         url: wmsUrl,
         params: {
-          LAYERS: 'opengeo:' + layerName,
+          LAYERS: workspace + ':' + layerName,
           TILED: true
         },
         serverType: 'geoserver',
@@ -95,7 +92,6 @@
     visible: true
   });
 
-
   var allLayers = [baseLayer]
     .concat(iceLayers)
     .concat(medianLayer)
@@ -105,20 +101,21 @@
     target: 'map',
     renderer: 'canvas',
     layers: allLayers,
-    view: new ol.View2D({
+    view: new ol.View({
       center: [-5049.84109515, 825838.67673878],
       zoom: 2,
       projection: projection3408
-    }),
-    interactions: ol.interaction.defaults().extend([
-      new ol.interaction.DragRotateAndZoom()
-    ])
+    })
   });
 
   // turn on the single layer that is clicked on
   $('#radios').click(function(e) {
     var target = e.target;
     var layerName = target.getAttribute('data-radio');
+    if (!layerName) {
+      // user clicked in area but not on radio
+      return;
+    }
     var layer = layerLookup[layerName];
     if (!layer) {
       throw new Error('Could not find layer name: ' + layerName);
