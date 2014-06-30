@@ -101,7 +101,7 @@
     target: 'map',
     renderer: 'canvas',
     layers: allLayers,
-    view: new ol.View2D({
+    view: new ol.View({
       center: [-5049.84109515, 825838.67673878],
       zoom: 2,
       projection: projection3408
