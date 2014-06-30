@@ -117,45 +117,42 @@ The from/to table calculation is a little complex::
 
   -- Create the from/to table
   CREATE TABLE lwss_from_to AS
-  WITH endpoints_many AS (
-    SELECT ws_key, Min(seg_no) AS seg_no, wsg_id
-    FROM lwss
-    WHERE seg_no > 0 AND ws_key = bl_key
-    GROUP BY wsg_id, ws_key
-    ORDER BY ws_key
-  ),
-  endpoints AS (
-    SELECT l.ws_key, l.seg_no, l.wsg_id, Max(l.l_magnitud) AS l_magnitud
-    FROM lwss l 
-    JOIN endpoints_many e USING (wsg_id, ws_key, seg_no)
-    GROUP BY l.ws_key, l.seg_no, l.wsg_id
-    ORDER BY ws_key
-  ),
-  downstream_ws_keys AS (
-    SELECT 
-      b.geom, e.wsg_id AS from_wsg_id, e.ws_key AS from_ws_key, 
-      e.seg_no AS from_seg_no, a.wsg_id AS to_wsg_id, a.ws_key AS to_ws_key
-    FROM endpoints e 
-    JOIN lwss b 
-    USING (wsg_id, ws_key, seg_no, l_magnitud)
-    JOIN lwss a
-    ON a.geom && ST_Expand(b.geom, 1)
-    AND ST_Distance(ST_EndPoint(a.geom), ST_StartPoint(b.geom)) < 1
-    ORDER BY from_wsg_id, from_ws_key
+  WITH seg_candidates AS (
+  SELECT 
+    a.geom AS geom,
+    a.wsg_id AS from_wsg_id,
+    a.ws_key AS from_ws_key,
+    a.seg_no AS from_seg_no,
+    b.wsg_id AS to_wsg_id,
+    b.ws_key AS to_ws_key,
+    b.seg_no AS to_seg_no
+  FROM lwss a JOIN lwss b 
+    ON a.geom && b.geom 
+    AND st_distance(st_endpoint(b.geom),st_startpoint(a.geom)) < 1
+    AND a.ws_key != b.ws_key
+    AND a.seg_no > 0
+    AND a.ws_key = a.bl_key
+    AND b.code != '2300'
+    AND a.wsg_id = 'UEUT'
   ),
   downstream_seg_candidates AS (
-    SELECT 
-      d.from_wsg_id, d.from_ws_key, d.from_seg_no, 
-      d.to_wsg_id, d.to_ws_key, l.seg_no AS to_seg_no
-    FROM lwss l JOIN downstream_ws_keys d
-    ON ST_DWithin(d.geom, l.geom, 500)
-    WHERE l.bl_key = l.ws_key
-    AND l.ws_key = d.to_ws_key
-    AND l.wsg_id = d.to_wsg_id
-    ORDER BY from_wsg_id, from_ws_key, from_seg_no, to_wsg_id, to_ws_key, 
-             ST_Distance(ST_EndPoint(l.geom), ST_StartPoint(d.geom))
+  SELECT 
+    a.from_wsg_id AS from_wsg_id,
+    a.from_ws_key AS from_ws_key,
+    a.from_seg_no AS from_seg_no,
+    c.wsg_id AS to_wsg_id,
+    c.ws_key AS to_ws_key,
+    c.seg_no AS to_seg_no
+  FROM seg_candidates a JOIN lwss c
+    ON ST_DWithin(a.geom, c.geom, 500)
+    AND c.wsg_id = a.to_wsg_id
+    AND c.ws_key = a.to_ws_key
+    AND c.bl_key = c.ws_key
+  ORDER BY from_wsg_id, from_ws_key, from_seg_no, to_wsg_id, to_ws_key,
+           ST_Distance(ST_StartPoint(a.geom), ST_EndPoint(c.geom)) ASC
   )
   SELECT DISTINCT ON (from_wsg_id, from_ws_key, from_seg_no) * FROM downstream_seg_candidates;
+  
 
   -- Index the from/to table
   CREATE INDEX lwss_from_to_idx ON lwss_from_to (from_wsg_id, from_ws_key);
