@@ -1,7 +1,7 @@
 
 
-//var baseUrl = 'http://apps.opengeo.org';
-var baseUrl = 'http://localhost:8000/gs';
+var baseUrl = 'http://apps.boundlessgeo.com';
+//var baseUrl = 'http://localhost:8000/gs';
 
 var wfsUrl = baseUrl + '/geoserver/wfs';
 
@@ -145,7 +145,7 @@ function selectRiver(evt) {
   var viewResolution = /** @type {number} */ (view.getResolution());
   var url = riverSource.getGetFeatureInfoUrl(
       evt.coordinate, viewResolution, viewProjection,
-      {'feature_count': 1, 'INFO_FORMAT': 'application/json'});
+      {'feature_count': 1, 'INFO_FORMAT': 'application/json', buffer: 8});
 
   $.get(url, function(res) {
     if (res && res.features) {
