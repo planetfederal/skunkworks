@@ -16,7 +16,7 @@
               <GraphicFill>
                   <Graphic>
                       <ExternalGraphic>
-                          <OnlineResource xlink:href="file:stone-pattern.jpg" xlink:type="simple"/>
+                          <OnlineResource xlink:href="http://data.opengeo.org/workshops/stone-pattern.jpg" xlink:type="simple"/>
                           <Format>image/jpeg</Format>
                       </ExternalGraphic>
                   </Graphic>
