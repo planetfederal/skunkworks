@@ -125,8 +125,9 @@ var app = (function() {
             var text =  cleared ?
                 (getMinedNeighbours(feature).length || '') + '' :
                 '';
-            if (!styleCache[text]) {
-              styleCache[text] = [new ol.style.Style({
+            var key = text + (cleared ? '_cleared' : ''); 
+            if (!styleCache[key]) {
+              styleCache[key] = [new ol.style.Style({
                 fill: cleared ?
                     new ol.style.Fill({color: '#b8b672'}) :
                     new ol.style.Fill({color: 'rgba(0, 0, 0, 0)'}),
@@ -143,7 +144,7 @@ var app = (function() {
                 })
               })];
             }
-            return styleCache[text];
+            return styleCache[key];
           };
         }())
       })
