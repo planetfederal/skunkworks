@@ -269,3 +269,28 @@ Interface
 To run dev server:
 
 npm install && npm start
+
+
+
+Building the App
+================
+
+- Start with the Suite SDK ol3view template
+- Change the center zoom to::
+
+    var center = [-13772294, 6237567];
+    var zoom = 10;
+
+- Add MapBox Terrain base to the layer chooser::
+
+    // MapBox grey base
+    new ol.layer.Tile({
+      title: 'Terrain',
+      group: "background",
+      visible: true,
+       source: new ol.source.XYZ({
+         url: 'http://{a-c}.tiles.mapbox.com/v3/nps.2yxv8n84/{z}/{x}/{y}.png'
+       })
+    }),
+
+- 
